@@ -205,10 +205,10 @@ vec3 nlRenderEndFog(nl_skycolor skycol, vec3 viewDir) {
 
 #ifdef NL_UNDERWATER_STREAKS
 // Underwater light shafts: no noise, no hash, no acos/exp/pow. Two soft layers of 2 sin() each, fixed in the
-// world (vertical, like light refracted below the surface) so the shafts move with the camera. The sine
+// world (parallel to the sun) so the shafts move with the camera. The sine
 // coefficients are multiples of 2*PI/32, so the pattern repeats exactly every 32 cells and the wrapped camera
-// position (nlStreakCamera) causes no jump. The pattern does NOT depend on the sun's rotation (that made it
-// slide quickly at dawn/dusk); the sun only adds a small constant-ish lean and the glow around the core.
+// position (nlStreakCamera) causes no jump. The pattern does NOT depend on the camera-relative sun basis (that made it
+// slide quickly at dawn/dusk); shafts radiate from the sun and the camera term uses fixed world x/z.
 float nlStreakLayer(vec2 p, vec2 a, vec2 b, vec2 ph) {
   const float K0 = 0.19634954; // 2*PI/32
   return 0.5 + 0.5*sin(K0*dot(a, p) + ph.x)*sin(K0*dot(b, p) + ph.y);
@@ -217,7 +217,12 @@ float nlStreakLayer(vec2 p, vec2 a, vec2 b, vec2 ph) {
 vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
   float cs = clamp(dot(viewDir, sunDir), -1.0, 1.0);
 
-  vec2 e = viewDir.xz/(length(viewDir.xz) + 1e-5) + 0.25*sunDir.xz;
+  // angle around the sun (fixed reference axis, so the basis only turns as slowly as the sun itself)
+  vec3 rayR = cross(vec3(0.0, 0.0, 1.0), sunDir);
+  rayR = length(rayR) > 0.001 ? normalize(rayR) : vec3(1.0, 0.0, 0.0);
+  vec3 rayU = cross(sunDir, rayR);
+  vec2 e = vec2(dot(viewDir, rayR), dot(viewDir, rayU));
+  e /= length(e) + 1e-5;
   vec2 c = streakC + vec2(0.015, -0.012)*t; // camera position in cells + very slow drift
 
   float l0 = smoothstep(0.25, 1.00, nlStreakLayer(c + 3.5*e,  vec2(11.0, 8.0), vec2(-6.0, 13.0), vec2(0.0, 1.3)));
