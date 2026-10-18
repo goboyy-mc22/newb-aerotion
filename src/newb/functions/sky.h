@@ -203,6 +203,57 @@ vec3 nlRenderEndFog(nl_skycolor skycol, vec3 viewDir) {
   return mix(skycol.zenith, skycol.horizon, pow(1.0 - grad, 1.35));
 }
 
+#ifdef NL_UNDERWATER_STREAKS
+// cheap 1D hash/noise (no sin(): stable on mobile GPUs)
+float nlStreakHash(float p) {
+  p = fract(p*0.1031);
+  p *= p + 33.33;
+  p *= p + p;
+  return fract(p);
+}
+
+float nlStreakNoise(float x) {
+  float i = floor(x);
+  float f = x - i;
+  f = f*f*(3.0 - 2.0*f);
+  return mix(nlStreakHash(i), nlStreakHash(i + 1.0), f);
+}
+
+// underwater light shafts: many thin rays fanning out from the (refracted) sun.
+// Four layers of noise over the angle around the sun (wide beams -> thin threads) give shafts of different
+// width and brightness with dark gaps between them; each shaft shimmers slowly along its length.
+vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, float t) {
+  float cs = clamp(dot(viewDir, sunDir), -1.0, 1.0);
+  float ang = acos(cs);
+
+  vec3 rayR = cross(vec3(0.0, 1.0, 0.0), sunDir);
+  rayR = length(rayR) > 0.001 ? normalize(rayR) : vec3(1.0, 0.0, 0.0);
+  float a = atan2(dot(viewDir, cross(sunDir, rayR)), dot(viewDir, rayR));
+
+  float beams  = smoothstep(0.50, 0.90, nlStreakNoise(a*5.0   + 0.05*t));
+  float shafts = smoothstep(0.60, 0.97, nlStreakNoise(a*17.0  + 0.11*t + 13.0));
+  float thread = smoothstep(0.70, 0.98, nlStreakNoise(a*53.0  - 0.07*t + 41.0));
+  float fine   = smoothstep(0.75, 0.99, nlStreakNoise(a*131.0 + 0.05*t + 7.0));
+  float rays = 0.50*beams*(0.25 + 0.75*shafts)
+             + 0.55*shafts*(0.15 + 0.85*beams)
+             + 0.35*thread*(0.20 + 0.80*shafts)
+             + 0.15*fine*(0.30 + 0.70*beams);
+
+  // light breaks up while it travels through the water
+  float cell = floor(a*53.0);
+  rays *= 0.65 + 0.35*sin(ang*(10.0 + 8.0*nlStreakHash(cell)) - t*(0.6 + 0.5*nlStreakHash(cell + 3.0)) + 6.28*nlStreakHash(cell + 9.0));
+
+  float fall = 1.0/(1.0 + 2.25*ang*ang);          // long, soft fall-off: shafts reach far from the sun
+  float core = pow(max(cs, 0.0), 14.0);            // bright spot where the sun is
+  float glow = exp(-4.0*ang);
+  float up = 0.35 + 0.65*clamp(0.5 + 0.5*viewDir.y, 0.0, 1.0);
+  float sunUp = smoothstep(-0.1, 0.2, sunDir.y);   // no rays at night
+
+  float streaks = (1.15*rays*fall + 0.8*core + 0.25*glow)*up*sunUp;
+  return streaks*vec3(0.62, 0.82, 1.0);
+}
+#endif
+
 vec3 nlRenderSky(nl_skycolor skycol, nl_environment env, vec3 viewDir, float t, bool isSkyPlane) {
   vec3 sky;
   viewDir.y = -viewDir.y;
@@ -212,23 +263,9 @@ vec3 nlRenderSky(nl_skycolor skycol, nl_environment env, vec3 viewDir, float t, 
   } else {
     sky = renderOverworldSky(skycol, env, viewDir, isSkyPlane);
     #ifdef NL_UNDERWATER_STREAKS
-       if (env.underwater) {
-         // light rays radiating from the (refracted) sun, softly fading away from it
-         float cs = clamp(dot(viewDir, env.sunDir), -1.0, 1.0);
-         float ang = acos(cs);
-         vec3 rayR = cross(vec3(0.0, 1.0, 0.0), env.sunDir);
-         rayR = length(rayR) > 0.001 ? normalize(rayR) : vec3(1.0, 0.0, 0.0);
-         float a = atan2(dot(viewDir, cross(env.sunDir, rayR)), dot(viewDir, rayR));
-         float spread = 0.5 + 0.5*sin(9.0*a + 0.35*t + 1.6*sin(5.0*a - 0.5*t));
-         spread *= 0.7 + 0.15*sin(19.0*a - 0.7*t + 1.0);
-         float rays = pow(clamp(spread, 0.0, 1.0), 2.2);
-         float fall = exp(-2.1*ang);
-         float core = pow(max(cs, 0.0), 10.0);
-         float up = 0.5 + 0.5*viewDir.y;
-         float sunUp = smoothstep(-0.1, 0.2, env.sunDir.y); // no rays at night
-         float streaks = (0.35*rays*fall + 0.5*core + 0.18*fall)*(0.4 + 0.6*up)*sunUp;
-         sky += NL_UNDERWATER_STREAKS*streaks*vec3(0.55, 1.0, 1.1);
-       }
+      if (env.underwater) {
+        sky += NL_UNDERWATER_STREAKS*nlUnderwaterStreaks(viewDir, env.sunDir, t);
+      }
     #endif
   }
 
