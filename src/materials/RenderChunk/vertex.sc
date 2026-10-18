@@ -86,6 +86,8 @@ void main() {
   #endif
 
   nl_environment env = nlDetectEnvironment(TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
+
+  env.streakC = nlStreakCamera(CameraPosition.xyz, env.sunDir);
   nl_skycolor skycol = nlSkyColors(env);
 
   // time

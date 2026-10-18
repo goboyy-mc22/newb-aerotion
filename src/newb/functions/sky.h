@@ -204,44 +204,55 @@ vec3 nlRenderEndFog(nl_skycolor skycol, vec3 viewDir) {
 }
 
 #ifdef NL_UNDERWATER_STREAKS
-// cheap 1D hash/noise (no sin(): stable on mobile GPUs)
-float nlStreakHash(float p) {
-  p = fract(p*0.1031);
-  p *= p + 33.33;
-  p *= p + p;
-  return fract(p);
+// cheap hash/noise without sin() (stable on mobile GPUs); tiles every 32 cells so the camera position can be
+// wrapped without a visible jump
+float nlStreakHash(vec2 p) {
+  p = mod(p, 32.0);
+  vec3 p3 = fract(vec3(p.xyx)*0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y)*p3.z);
 }
 
-float nlStreakNoise(float x) {
-  float i = floor(x);
-  float f = x - i;
+float nlStreakNoise(vec2 x) {
+  vec2 i = floor(x);
+  vec2 f = x - i;
   f = f*f*(3.0 - 2.0*f);
-  return mix(nlStreakHash(i), nlStreakHash(i + 1.0), f);
+  return mix(mix(nlStreakHash(i), nlStreakHash(i + vec2(1.0, 0.0)), f.x),
+             mix(nlStreakHash(i + vec2(0.0, 1.0)), nlStreakHash(i + vec2(1.0, 1.0)), f.x), f.y);
 }
 
 // underwater light shafts: many thin rays fanning out from the (refracted) sun.
-// Four layers of noise over the angle around the sun (wide beams -> thin threads) give shafts of different
-// width and brightness with dark gaps between them; each shaft shimmers slowly along its length.
-vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, float t) {
+// The shafts are fixed in the world (parallel to the sun direction), so they move when the camera moves: a layer
+// sampled r cells away shifts by about 1/r per block moved, so near shafts sweep across the view quickly while far
+// shafts barely move. Five layers (wide beams -> thin hairs) with dark gaps between them; shafts also shimmer slowly.
+vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
   float cs = clamp(dot(viewDir, sunDir), -1.0, 1.0);
   float ang = acos(cs);
 
+  // plane perpendicular to the sun direction: shafts are points in it, the view ray walks a line through it
   vec3 rayR = cross(vec3(0.0, 1.0, 0.0), sunDir);
   rayR = length(rayR) > 0.001 ? normalize(rayR) : vec3(1.0, 0.0, 0.0);
-  float a = atan2(dot(viewDir, cross(sunDir, rayR)), dot(viewDir, rayR));
+  vec3 rayU = cross(sunDir, rayR);
+  vec2 e = vec2(dot(viewDir, rayR), dot(viewDir, rayU));
+  e /= length(e) + 1e-5;
+  vec2 c = streakC + vec2(0.05, -0.04)*t; // camera position in noise cells (1 cell = 2 blocks) + slow sway
 
-  float beams  = smoothstep(0.50, 0.90, nlStreakNoise(a*5.0   + 0.05*t));
-  float shafts = smoothstep(0.60, 0.97, nlStreakNoise(a*17.0  + 0.11*t + 13.0));
-  float thread = smoothstep(0.70, 0.98, nlStreakNoise(a*53.0  - 0.07*t + 41.0));
-  float fine   = smoothstep(0.75, 0.99, nlStreakNoise(a*131.0 + 0.05*t + 7.0));
+  float beams  = smoothstep(0.50, 0.90, nlStreakNoise(c + 4.0*e));
+  float shafts = smoothstep(0.58, 0.96, nlStreakNoise(c + 11.0*e));
+  float thread = smoothstep(0.64, 0.97, nlStreakNoise(c + 30.0*e));
+  float fine   = smoothstep(0.70, 0.98, nlStreakNoise(c + 75.0*e));
+  float hair   = smoothstep(0.74, 0.99, nlStreakNoise(c + 190.0*e));
   float rays = 0.50*beams*(0.25 + 0.75*shafts)
              + 0.55*shafts*(0.15 + 0.85*beams)
              + 0.35*thread*(0.20 + 0.80*shafts)
-             + 0.15*fine*(0.30 + 0.70*beams);
+             + 0.22*fine*(0.30 + 0.70*shafts)
+             + 0.14*hair*(0.30 + 0.70*beams);
 
   // light breaks up while it travels through the water
-  float cell = floor(a*53.0);
-  rays *= 0.65 + 0.35*sin(ang*(10.0 + 8.0*nlStreakHash(cell)) - t*(0.6 + 0.5*nlStreakHash(cell + 3.0)) + 6.28*nlStreakHash(cell + 9.0));
+  vec2 cellPos = floor(c + 30.0*e);
+  float h1 = nlStreakHash(cellPos);
+  float h2 = nlStreakHash(cellPos + vec2(3.0, 9.0));
+  rays *= 0.65 + 0.35*sin(ang*(10.0 + 8.0*h1) - t*(0.6 + 0.5*h2) + 6.28*h1);
 
   float fall = 1.0/(1.0 + 2.25*ang*ang);          // long, soft fall-off: shafts reach far from the sun
   float core = pow(max(cs, 0.0), 14.0);            // bright spot where the sun is
@@ -264,7 +275,7 @@ vec3 nlRenderSky(nl_skycolor skycol, nl_environment env, vec3 viewDir, float t, 
     sky = renderOverworldSky(skycol, env, viewDir, isSkyPlane);
     #ifdef NL_UNDERWATER_STREAKS
       if (env.underwater) {
-        sky += NL_UNDERWATER_STREAKS*nlUnderwaterStreaks(viewDir, env.sunDir, t);
+        sky += NL_UNDERWATER_STREAKS*nlUnderwaterStreaks(viewDir, env.sunDir, env.streakC, t);
       }
     #endif
   }
