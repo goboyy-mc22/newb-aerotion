@@ -240,7 +240,7 @@ vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
   float sunUp = 1.0 - (1.0 - dd*dd)*(1.0 - dd*dd)*(1.0 - dd*dd); // 0 at dawn/night, fades in as dawn fades out
 
   float streaks = (0.85*rays*q*fade + glow + 0.16*q*q*q)*up*sunUp;
-  return streaks*vec3(0.62, 0.82, 1.0);
+  return streaks*vec3(0.86, 0.93, 1.0); // slightly white-blue
 }
 #endif
 
