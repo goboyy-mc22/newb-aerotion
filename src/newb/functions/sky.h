@@ -204,9 +204,8 @@ vec3 nlRenderEndFog(nl_skycolor skycol, vec3 viewDir) {
 }
 
 #ifdef NL_UNDERWATER_STREAKS
-#ifdef NL_UNDERWATER_STREAKS_LITE
-// LITE version (LOW subpack): no noise, no hash, no acos/exp/pow. Three layers of 2 sin() each, still fixed in the
-// world so the shafts move with the camera. The sine coefficients are multiples of 2*PI/32, so the pattern repeats
+// Underwater light shafts: no noise, no hash, no acos/exp/pow. Three layers of 2 sin() each, fixed in the
+// world (parallel to the sun direction) so the shafts move with the camera. The sine coefficients are multiples of 2*PI/32, so the pattern repeats
 // exactly every 32 cells and the wrapped camera position (nlStreakCamera) causes no jump.
 float nlStreakLayer(vec2 p, vec2 a, vec2 b, vec2 ph) {
   const float K0 = 0.19634954; // 2*PI/32
@@ -239,67 +238,6 @@ vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
   float streaks = (1.15*rays*q + 0.8*core + 0.25*q*q*q)*up*sunUp;
   return streaks*vec3(0.62, 0.82, 1.0);
 }
-#else
-// cheap hash/noise without sin() (stable on mobile GPUs); tiles every 32 cells so the camera position can be
-// wrapped without a visible jump
-float nlStreakHash(vec2 p) {
-  p = mod(p, 32.0);
-  vec3 p3 = fract(vec3(p.xyx)*0.1031);
-  p3 += dot(p3, p3.yzx + 33.33);
-  return fract((p3.x + p3.y)*p3.z);
-}
-
-float nlStreakNoise(vec2 x) {
-  vec2 i = floor(x);
-  vec2 f = x - i;
-  f = f*f*(3.0 - 2.0*f);
-  return mix(mix(nlStreakHash(i), nlStreakHash(i + vec2(1.0, 0.0)), f.x),
-             mix(nlStreakHash(i + vec2(0.0, 1.0)), nlStreakHash(i + vec2(1.0, 1.0)), f.x), f.y);
-}
-
-// underwater light shafts: many thin rays fanning out from the (refracted) sun.
-// The shafts are fixed in the world (parallel to the sun direction), so they move when the camera moves: a layer
-// sampled r cells away shifts by about 1/r per block moved, so near shafts sweep across the view quickly while far
-// shafts barely move. Five layers (wide beams -> thin hairs) with dark gaps between them; shafts also shimmer slowly.
-vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
-  float cs = clamp(dot(viewDir, sunDir), -1.0, 1.0);
-  float ang = acos(cs);
-
-  // plane perpendicular to the sun direction: shafts are points in it, the view ray walks a line through it
-  vec3 rayR = cross(vec3(0.0, 1.0, 0.0), sunDir);
-  rayR = length(rayR) > 0.001 ? normalize(rayR) : vec3(1.0, 0.0, 0.0);
-  vec3 rayU = cross(sunDir, rayR);
-  vec2 e = vec2(dot(viewDir, rayR), dot(viewDir, rayU));
-  e /= length(e) + 1e-5;
-  vec2 c = streakC + vec2(0.05, -0.04)*t; // camera position in noise cells (1 cell = 2 blocks) + slow sway
-
-  float beams  = smoothstep(0.50, 0.90, nlStreakNoise(c + 4.0*e));
-  float shafts = smoothstep(0.58, 0.96, nlStreakNoise(c + 11.0*e));
-  float thread = smoothstep(0.64, 0.97, nlStreakNoise(c + 30.0*e));
-  float fine   = smoothstep(0.70, 0.98, nlStreakNoise(c + 75.0*e));
-  float hair   = smoothstep(0.74, 0.99, nlStreakNoise(c + 190.0*e));
-  float rays = 0.50*beams*(0.25 + 0.75*shafts)
-             + 0.55*shafts*(0.15 + 0.85*beams)
-             + 0.35*thread*(0.20 + 0.80*shafts)
-             + 0.22*fine*(0.30 + 0.70*shafts)
-             + 0.14*hair*(0.30 + 0.70*beams);
-
-  // light breaks up while it travels through the water
-  vec2 cellPos = floor(c + 30.0*e);
-  float h1 = nlStreakHash(cellPos);
-  float h2 = nlStreakHash(cellPos + vec2(3.0, 9.0));
-  rays *= 0.65 + 0.35*sin(ang*(10.0 + 8.0*h1) - t*(0.6 + 0.5*h2) + 6.28*h1);
-
-  float fall = 1.0/(1.0 + 2.25*ang*ang);          // long, soft fall-off: shafts reach far from the sun
-  float core = pow(max(cs, 0.0), 14.0);            // bright spot where the sun is
-  float glow = exp(-4.0*ang);
-  float up = 0.35 + 0.65*clamp(0.5 + 0.5*viewDir.y, 0.0, 1.0);
-  float sunUp = smoothstep(-0.1, 0.2, sunDir.y);   // no rays at night
-
-  float streaks = (1.15*rays*fall + 0.8*core + 0.25*glow)*up*sunUp;
-  return streaks*vec3(0.62, 0.82, 1.0);
-}
-#endif // NL_UNDERWATER_STREAKS_LITE
 #endif
 
 vec3 nlRenderSky(nl_skycolor skycol, nl_environment env, vec3 viewDir, float t, bool isSkyPlane) {
