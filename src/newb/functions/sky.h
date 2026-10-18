@@ -231,7 +231,8 @@ vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
   float fade = 1.0 - c8*c8;                      // shafts start away from the sun: no line-shaped core
   float glow = cs > 0.0 ? 0.30*c8 + 0.22*c8*c8 + 0.10*c4*c2 : 0.0; // soft round glow, no sharp centre
   float up = 0.35 + 0.65*clamp(0.5 + 0.5*viewDir.y, 0.0, 1.0);
-  float sunUp = smoothstep(-0.1, 0.2, sunDir.y); // no rays at night
+  float dd = max(sunDir.y, 0.0);
+  float sunUp = 1.0 - (1.0 - dd*dd)*(1.0 - dd*dd)*(1.0 - dd*dd); // 0 at dawn/night, fades in as dawn fades out
 
   float streaks = (0.85*rays*q*fade + glow + 0.16*q*q*q)*up*sunUp;
   return streaks*vec3(0.62, 0.82, 1.0);
