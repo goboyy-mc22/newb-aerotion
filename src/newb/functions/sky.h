@@ -221,6 +221,9 @@ vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
   vec3 rayU = cross(sunDir, rayR);
   vec2 e = vec2(dot(viewDir, rayR), dot(viewDir, rayU));
   e /= length(e) + 1e-5;
+  // water ripple: the shafts bend gently and the bend travels along them (amplitude in radians)
+  float wv = 0.007*sin(9.0*(1.0 - cs) - 2.0*t + 3.0*e.x);
+  e += wv*vec2(-e.y, e.x);
   vec2 c = streakC + vec2(0.05, -0.04)*t; // camera position in noise cells + slow sway
 
   float l0 = smoothstep(0.40, 0.80, nlStreakLayer(c + 3.5*e,  vec2(19.0, 14.0), vec2(-10.0, 21.0), vec2(0.0, 1.3)));
@@ -271,6 +274,9 @@ vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
   vec3 rayU = cross(sunDir, rayR);
   vec2 e = vec2(dot(viewDir, rayR), dot(viewDir, rayU));
   e /= length(e) + 1e-5;
+  // water ripple: the shafts bend gently and the bend travels along them (amplitude in radians)
+  float wv = 0.012*sin(5.0*ang - 2.0*t + 3.0*e.x);
+  e += wv*vec2(-e.y, e.x);
   vec2 c = streakC + vec2(0.05, -0.04)*t; // camera position in noise cells (1 cell = 2 blocks) + slow sway
 
   float beams  = smoothstep(0.50, 0.90, nlStreakNoise(c + 4.0*e));
