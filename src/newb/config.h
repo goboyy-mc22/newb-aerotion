@@ -239,6 +239,7 @@
 
   #undef NL_UNDERWATER_STREAKS
   #define NL_UNDERWATER_STREAKS 0.5
+  #define NL_UNDERWATER_STREAKS_LITE // cheap streaks: no noise, 3 layers of sin()
 
   #undef NL_LAVA_NOISE_BUMP
   #define NL_LAVA_NOISE_BUMP 0.2
