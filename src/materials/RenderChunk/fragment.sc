@@ -87,13 +87,15 @@ void main() {
 
   float rainShadowMask = mix(1.0, 0.25, env.rainFactor);
   float nightShadowMask = mix(1.0, 0.25, 1.0 - smoothstep(-0.12, 0.25, env.dayFactor)); // eased night mask (same curve as the sky)
+  // side shadow only exists outdoors, where sun/moon light reaches (skylight); none indoors or in caves
+  float outdoorMask = smoothstep(0.55, 0.85, v_lightmapUV.y);
   float shadow = smoothstep(0.875, 0.860, pow(v_lightmapUV.y, 2.0));
   shadow = mix(shadow, 0.0, pow(v_lightmapUV.x * 1.2, 6.0));
   diffuse.rgb *= 1.0 - 0.68 * shadow * rainShadowMask * nightShadowMask;
 
   if (v_extra.b <= 0.9) {
     float sideshadow = smoothstep(0.64, 0.62, v_color1.g);
-    diffuse.rgb *= 1.0 - 0.62 * sideshadow * rainShadowMask * nightShadowMask;
+    diffuse.rgb *= 1.0 - 0.62 * sideshadow * outdoorMask * rainShadowMask * nightShadowMask;
   }
 
   diffuse.rgb += glow;
