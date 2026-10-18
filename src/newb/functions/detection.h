@@ -80,10 +80,10 @@ nl_environment calculateSunParams(nl_environment env, float TIME_OF_DAY) {
   return env;
 }
 
-// camera position on the horizontal plane (1 cell = 2 blocks), wrapped to the 32-cell
+// camera position on the horizontal plane (1 cell = ~8 blocks), wrapped to the 32-cell
 // period of the streak noise so it stays small and precise even far from the origin
 vec2 nlStreakCamera(highp vec3 camPos) {
-  return mod(0.5*camPos.xz, 32.0);
+  return mod(0.12*camPos.xz, 32.0); // 0.12 cell per block: shafts drift slowly while walking
 }
 
 nl_environment nlDetectEnvironment(float TIME_OF_DAY, vec3 FOG_COLOR, vec3 FOG_CONTROL) {
