@@ -185,10 +185,11 @@
 #define NL_GROUND_RAIN_WETNESS 1.0 // 0.0 no wetness ~ 1.0 fully wet blocks when raining
 #define NL_GROUND_RAIN_PUDDLES 1.0 // 0.0 no puddles ~ 1.0 puddles
 
-// side shadow only where there is skylight (outdoors). Below MIN: no side shadow (indoors/caves), above MAX: full.
-// Still shadow indoors -> raise both (e.g. 0.7/0.9). Outdoor side shadow too thin/small -> lower both (e.g. 0.3/0.55).
-#define NL_SIDESHADOW_SKY_MIN 0.50
-#define NL_SIDESHADOW_SKY_MAX 0.70
+// Side shadow only where sun/moon light reaches (skylight level 15 = 15/16 = 0.9375, open sky). Light that leaks in
+// through windows/openings is level 14 or lower (<= 0.875), so it gets no side shadow. Below MIN: none, above MAX: full.
+// Outdoor side shadow too thin near edges -> lower both (e.g. 0.75/0.90). Still shadow near windows -> keep as is.
+#define NL_SIDESHADOW_SKY_MIN 0.86
+#define NL_SIDESHADOW_SKY_MAX 0.93
 
 /* Entity (Actor, ItemInHand) */
 #define NL_ENTITY_BRIGHTNESS     0.1 // 0.1 dark ~ 1.6 bright
