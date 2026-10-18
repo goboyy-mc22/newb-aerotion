@@ -80,13 +80,10 @@ nl_environment calculateSunParams(nl_environment env, float TIME_OF_DAY) {
   return env;
 }
 
-// camera position in the plane perpendicular to the sun direction (1 cell = 2 blocks), wrapped to the 32-cell
+// camera position on the horizontal plane (1 cell = 2 blocks), wrapped to the 32-cell
 // period of the streak noise so it stays small and precise even far from the origin
-vec2 nlStreakCamera(highp vec3 camPos, vec3 sunDir) {
-  vec3 r = cross(vec3(0.0, 1.0, 0.0), sunDir);
-  r = length(r) > 0.001 ? normalize(r) : vec3(1.0, 0.0, 0.0);
-  vec3 u = cross(sunDir, r);
-  return mod(0.5*vec2(dot(camPos, r), dot(camPos, u)), 32.0);
+vec2 nlStreakCamera(highp vec3 camPos) {
+  return mod(0.5*camPos.xz, 32.0);
 }
 
 nl_environment nlDetectEnvironment(float TIME_OF_DAY, vec3 FOG_COLOR, vec3 FOG_CONTROL) {

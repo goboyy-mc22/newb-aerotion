@@ -24,7 +24,7 @@ void main() {
     v_underwaterRainTimeDay.w = detectDayFactor(FogColor.rgb);
     nl_environment env;
     env = calculateSunParams(env, TimeOfDay.x);
-    v_streakC = nlStreakCamera(CameraPosition.xyz, env.sunDir);
+    v_streakC = nlStreakCamera(CameraPosition.xyz);
 
     // background quad
     vec4 pos = vec4(a_position.xzy, 1.0);

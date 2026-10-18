@@ -204,9 +204,11 @@ vec3 nlRenderEndFog(nl_skycolor skycol, vec3 viewDir) {
 }
 
 #ifdef NL_UNDERWATER_STREAKS
-// Underwater light shafts: no noise, no hash, no acos/exp/pow. Three layers of 2 sin() each, fixed in the
-// world (parallel to the sun direction) so the shafts move with the camera. The sine coefficients are multiples of 2*PI/32, so the pattern repeats
-// exactly every 32 cells and the wrapped camera position (nlStreakCamera) causes no jump.
+// Underwater light shafts: no noise, no hash, no acos/exp/pow. Two soft layers of 2 sin() each, fixed in the
+// world (vertical, like light refracted below the surface) so the shafts move with the camera. The sine
+// coefficients are multiples of 2*PI/32, so the pattern repeats exactly every 32 cells and the wrapped camera
+// position (nlStreakCamera) causes no jump. The pattern does NOT depend on the sun's rotation (that made it
+// slide quickly at dawn/dusk); the sun only adds a small constant-ish lean and the glow around the core.
 float nlStreakLayer(vec2 p, vec2 a, vec2 b, vec2 ph) {
   const float K0 = 0.19634954; // 2*PI/32
   return 0.5 + 0.5*sin(K0*dot(a, p) + ph.x)*sin(K0*dot(b, p) + ph.y);
@@ -215,27 +217,22 @@ float nlStreakLayer(vec2 p, vec2 a, vec2 b, vec2 ph) {
 vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
   float cs = clamp(dot(viewDir, sunDir), -1.0, 1.0);
 
-  vec3 rayR = cross(vec3(0.0, 1.0, 0.0), sunDir);
-  rayR = length(rayR) > 0.001 ? normalize(rayR) : vec3(1.0, 0.0, 0.0);
-  vec3 rayU = cross(sunDir, rayR);
-  vec2 e = vec2(dot(viewDir, rayR), dot(viewDir, rayU));
-  e /= length(e) + 1e-5;
-  vec2 c = streakC + vec2(0.05, -0.04)*t; // camera position in noise cells + slow sway
+  vec2 e = viewDir.xz/(length(viewDir.xz) + 1e-5) + 0.25*sunDir.xz;
+  vec2 c = streakC + vec2(0.015, -0.012)*t; // camera position in cells + very slow drift
 
-  float l0 = smoothstep(0.40, 0.80, nlStreakLayer(c + 3.5*e,  vec2(19.0, 14.0), vec2(-10.0, 21.0), vec2(0.0, 1.3)));
-  float l1 = smoothstep(0.52, 0.93, nlStreakLayer(c + 10.0*e, vec2(26.0, 20.0), vec2(-14.0, 29.0), vec2(2.1, 0.4)));
-  float l2 = smoothstep(0.66, 0.97, nlStreakLayer(c + 28.0*e, vec2(37.0, 28.0), vec2(-20.0, 42.0), vec2(4.0, 2.7)));
-  float rays = 0.8*l0*(0.3 + 0.7*l1) + 0.45*l1*(0.2 + 0.8*l0) + 0.25*l2*(0.25 + 0.75*l1);
+  float l0 = smoothstep(0.35, 0.95, nlStreakLayer(c + 3.5*e,  vec2(13.0, 10.0), vec2(-7.0, 15.0), vec2(0.0, 1.3)));
+  float l1 = smoothstep(0.45, 1.00, nlStreakLayer(c + 10.0*e, vec2(18.0, 14.0), vec2(-10.0, 20.0), vec2(2.1, 0.4)));
+  float rays = 0.55*l0*(0.35 + 0.65*l1) + 0.30*l1*(0.25 + 0.75*l0);
 
-  float q = 1.0/(1.0 + 4.5*(1.0 - cs));        // soft fall-off around the sun (no acos)
+  float q = 1.0/(1.0 + 3.0*(1.0 - cs));         // soft fall-off around the sun (no acos)
   float c2 = cs*cs;
   float c4 = c2*c2;
-  float c8 = c4*c4;
-  float core = cs > 0.0 ? c8*c4*c2 : 0.0;       // cs^14 without pow
+  float halo = cs > 0.0 ? c4*c2 : 0.0;          // cs^6, soft bloom
+  float core = cs > 0.0 ? halo*c4*c2 : 0.0;     // cs^14, small bright core
   float up = 0.35 + 0.65*clamp(0.5 + 0.5*viewDir.y, 0.0, 1.0);
   float sunUp = smoothstep(-0.1, 0.2, sunDir.y); // no rays at night
 
-  float streaks = (1.15*rays*q + 0.8*core + 0.25*q*q*q)*up*sunUp;
+  float streaks = (0.9*rays*q + 0.45*core + 0.13*halo + 0.18*q*q*q)*up*sunUp;
   return streaks*vec3(0.62, 0.82, 1.0);
 }
 #endif
