@@ -241,7 +241,7 @@ vec3 nlRenderSky(nl_skycolor skycol, nl_environment env, vec3 viewDir, float t, 
     sky = renderOverworldSky(skycol, env, viewDir, isSkyPlane);
     #ifdef NL_UNDERWATER_BLOOM
       if (env.underwater) {
-        sky += NL_UNDERWATER_BLOOM*nlUnderwaterBloom(viewDir, env.sunDir);
+        sky += NL_UNDERWATER_BLOOM*nlUnderwaterBloom(viewDir, env.sunDir, env.rainFactor);
       }
     #endif
   }
