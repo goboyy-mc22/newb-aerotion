@@ -203,45 +203,30 @@ vec3 nlRenderEndFog(nl_skycolor skycol, vec3 viewDir) {
   return mix(skycol.zenith, skycol.horizon, pow(1.0 - grad, 1.35));
 }
 
-#ifdef NL_UNDERWATER_STREAKS
-// Underwater light shafts: no noise, no hash, no acos/exp/pow. Two soft layers of 2 sin() each, fixed in the
-// world (parallel to the sun) so the shafts move with the camera. The sine
-// coefficients are multiples of 2*PI/32, so the pattern repeats exactly every 32 cells and the wrapped camera
-// position (nlStreakCamera) causes no jump. The pattern does NOT depend on the camera-relative sun basis (that made it
-// slide quickly at dawn/dusk); shafts radiate from the sun and the camera term uses fixed world x/z.
-float nlStreakLayer(vec2 p, vec2 a, vec2 b, vec2 ph) {
-  const float K0 = 0.19634954; // 2*PI/32
-  return 0.5 + 0.5*sin(K0*dot(a, p) + ph.x)*sin(K0*dot(b, p) + ph.y);
-}
-
-vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
-  float cs = clamp(dot(viewDir, sunDir), -1.0, 1.0);
-
-  // angle around the sun (fixed reference axis, so the basis only turns as slowly as the sun itself)
-  vec3 rayR = cross(vec3(0.0, 0.0, 1.0), sunDir);
-  rayR = length(rayR) > 0.001 ? normalize(rayR) : vec3(1.0, 0.0, 0.0);
-  vec3 rayU = cross(sunDir, rayR);
-  vec2 e = vec2(dot(viewDir, rayR), dot(viewDir, rayU));
-  e /= length(e) + 1e-5;
-  vec2 c = streakC + vec2(0.015, -0.012)*t; // camera position in cells + very slow drift
-
-  // wide soft bloom around the sun with very faint, broad shafts inside it (2 layers, no noise)
-  float l0 = smoothstep(0.45, 1.00, nlStreakLayer(c + 4.0*e,  vec2(8.0, 6.0),  vec2(-5.0, 10.0), vec2(0.0, 1.3)));
-  float l1 = smoothstep(0.55, 1.00, nlStreakLayer(c + 7.5*e,  vec2(12.0, 9.0), vec2(-7.0, 13.0), vec2(2.1, 0.4)));
-  float rays = 0.65*l0 + 0.35*l1;
-
-  float q = 1.0/(1.0 + 2.0*(1.0 - cs));         // soft fall-off around the sun (no acos)
-  float pc = max(cs, 0.0);
-  float c2 = pc*pc;
-  float c4 = c2*c2;
-  float c8 = c4*c4;
-  float glow = 0.75*c2*pc + 0.40*c8 + 0.30*c8*c8*c8; // big soft bloom + brighter centre, no hard core
-  float up = 0.5 + 0.5*clamp(0.5 + 0.5*viewDir.y, 0.0, 1.0);
+#ifdef NL_UNDERWATER_BLOOM
+// Underwater sun bloom: a wide, very soft glow around the sun (no rays, no noise, no acos/exp): the core follows the
+// sun shape (rounded square, NL_SUN_GLOW_SHAPE); the halo around it is round, so there is no outline or X arms.
+vec3 nlUnderwaterBloom(vec3 viewDir, vec3 sunDir) {
+  float cs = dot(viewDir, sunDir);
+  float dist = 1.0 - cs;
+  float shape2 = 1.0;
+  #ifdef NL_SUN_GLOW_SHAPE
+    vec3 sunR = cross(vec3(0.0, 1.0, 0.0), sunDir);
+    sunR = length(sunR) > 0.001 ? normalize(sunR) : vec3(1.0, 0.0, 0.0);
+    vec2 sunQ = abs(vec2(dot(viewDir, sunR), dot(viewDir, cross(sunDir, sunR)))) + 1e-4;
+    sunQ /= max(sunQ.x, sunQ.y);
+    vec2 sunP = pow(sunQ, vec2_splat(NL_SUN_GLOW_SHAPE));
+    float sunShape = pow(sunP.x + sunP.y, 1.0/NL_SUN_GLOW_SHAPE)/length(sunQ); // same p-norm as the sky glow
+    shape2 = mix(sunShape*sunShape, 1.0, 0.65);             // weaker squareness
+    shape2 = mix(shape2, 1.0, smoothstep(0.0, 0.05, dist)); // quickly round off away from the core
+  #endif
+  float q0 = 1.0/(1.0 + 4.0*dist);              // round halo
+  float q1 = 1.0/(1.0 + 10.0*dist);             // round halo
+  float q2 = 1.0/(1.0 + 28.0*dist*shape2);      // only the core follows the sun shape
+  float bloom = cs > 0.0 ? 0.105*q0*q0 + 0.265*q1*q1 + 0.35*q2*q2 : 0.0;
   float dd = max(sunDir.y, 0.0);
   float sunUp = 1.0 - (1.0 - dd*dd)*(1.0 - dd*dd)*(1.0 - dd*dd); // 0 at dawn/night, fades in as dawn fades out
-
-  float streaks = (glow*(1.0 + 0.35*rays*q) + 0.10*q*q)*up*sunUp;
-  return streaks*vec3(0.88, 0.96, 1.0);
+  return bloom*sunUp*vec3(0.80, 0.93, 1.0);
 }
 #endif
 
@@ -253,9 +238,9 @@ vec3 nlRenderSky(nl_skycolor skycol, nl_environment env, vec3 viewDir, float t, 
     sky = renderEndSky(skycol.horizon, skycol.zenith, viewDir, t);
   } else {
     sky = renderOverworldSky(skycol, env, viewDir, isSkyPlane);
-    #ifdef NL_UNDERWATER_STREAKS
+    #ifdef NL_UNDERWATER_BLOOM
       if (env.underwater) {
-        sky += NL_UNDERWATER_STREAKS*nlUnderwaterStreaks(viewDir, env.sunDir, env.streakC, t);
+        sky += NL_UNDERWATER_BLOOM*nlUnderwaterBloom(viewDir, env.sunDir);
       }
     #endif
   }
