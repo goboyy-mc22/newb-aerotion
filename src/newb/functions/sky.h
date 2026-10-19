@@ -206,7 +206,7 @@ vec3 nlRenderEndFog(nl_skycolor skycol, vec3 viewDir) {
 #ifdef NL_UNDERWATER_BLOOM
 // Underwater sun bloom: a wide, very soft glow around the sun (no rays, no noise, no acos/exp): the core follows the
 // sun shape (rounded square, NL_SUN_GLOW_SHAPE); the halo around it is round, so there is no outline or X arms.
-vec3 nlUnderwaterBloom(vec3 viewDir, vec3 sunDir) {
+vec3 nlUnderwaterBloom(vec3 viewDir, vec3 sunDir, float rainFactor) {
   float rainMask2 = 1.0 - env.rainFactor;
   float cs = dot(viewDir, sunDir);
   float dist = 1.0 - cs;
