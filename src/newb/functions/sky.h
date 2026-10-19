@@ -225,22 +225,24 @@ vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
   e /= length(e) + 1e-5;
   vec2 c = streakC + vec2(0.015, -0.012)*t; // camera position in cells + very slow drift
 
-  float l0 = smoothstep(0.25, 1.00, nlStreakLayer(c + 3.5*e,  vec2(11.0, 8.0), vec2(-6.0, 13.0), vec2(0.0, 1.3)));
-  float l1 = smoothstep(0.35, 1.05, nlStreakLayer(c + 10.0*e, vec2(15.0, 12.0), vec2(-8.0, 17.0), vec2(2.1, 0.4)));
-  float rays = 0.5*l0*(0.4 + 0.6*l1) + 0.25*l1*(0.3 + 0.7*l0);
+  // thin, long shafts fanning out from the sun (3 layers of different angular density, no noise)
+  float l0 = smoothstep(0.66, 0.88, nlStreakLayer(c + 4.0*e,  vec2(14.0, 10.0), vec2(-8.0, 16.0), vec2(0.0, 1.3)));
+  float l1 = smoothstep(0.76, 0.93, nlStreakLayer(c + 7.5*e,  vec2(16.0, 12.0), vec2(-9.0, 18.0), vec2(2.1, 0.4)));
+  float l2 = smoothstep(0.82, 0.96, nlStreakLayer(c + 11.0*e, vec2(17.0, 13.0), vec2(-10.0, 19.0), vec2(4.0, 2.7)));
+  float rays = 0.55*l0 + 0.30*l1 + 0.15*l2;
 
-  float q = 1.0/(1.0 + 3.0*(1.0 - cs));         // soft fall-off around the sun (no acos)
+  float q = 1.0/(1.0 + 1.2*(1.0 - cs));         // slow fall-off: shafts reach far from the sun (no acos)
   float c2 = cs*cs;
   float c4 = c2*c2;
   float c8 = c4*c4;
-  float fade = 1.0 - c8;                         // shafts start well away from the sun: big round core, no line-shaped centre
-  float glow = cs > 0.0 ? 0.20*c4*c2 + 0.22*c8 + 0.20*c8*c8 + 0.10*c4 : 0.0; // large soft glow (the sun is big)
-  float up = 0.35 + 0.65*clamp(0.5 + 0.5*viewDir.y, 0.0, 1.0);
+  float fade = 1.0 - c8;                         // shafts start away from the sun: big round glow, no line-shaped centre
+  float glow = cs > 0.0 ? 0.22*c4*c2 + 0.24*c8 + 0.22*c8*c8 + 0.12*c4 : 0.0; // large soft glow (the sun is big)
+  float up = 0.55 + 0.45*clamp(0.5 + 0.5*viewDir.y, 0.0, 1.0);
   float dd = max(sunDir.y, 0.0);
   float sunUp = 1.0 - (1.0 - dd*dd)*(1.0 - dd*dd)*(1.0 - dd*dd); // 0 at dawn/night, fades in as dawn fades out
 
-  float streaks = (0.85*rays*q*fade + glow + 0.16*q*q*q)*up*sunUp;
-  return streaks*vec3(0.86, 0.93, 1.0); // slightly white-blue
+  float streaks = (0.6*rays*q*fade + glow + 0.10*q*q*q)*up*sunUp;
+  return streaks*vec3(0.80, 0.91, 1.0);
 }
 #endif
 
