@@ -18,7 +18,7 @@ vec3 spectrum(float x) {
 }
 
 vec3 getUnderwaterCol(vec3 FOG_COLOR) {
-  return 2.0*NL_UNDERWATER_TINT*FOG_COLOR*FOG_COLOR;
+  return 1.0*NL_UNDERWATER_TINT*FOG_COLOR*FOG_COLOR;
 }
 
 vec3 getEndZenithCol() {
@@ -203,34 +203,6 @@ vec3 nlRenderEndFog(nl_skycolor skycol, vec3 viewDir) {
   return mix(skycol.zenith, skycol.horizon, pow(1.0 - grad, 1.35));
 }
 
-#ifdef NL_UNDERWATER_BLOOM
-// Underwater sun bloom: a wide, very soft glow around the sun (no rays, no noise, no acos/exp): the core follows the
-// sun shape (rounded square, NL_SUN_GLOW_SHAPE); the halo around it is round, so there is no outline or X arms.
-vec3 nlUnderwaterBloom(vec3 viewDir, vec3 sunDir, float rainFactor) {
-  float rainMask2 = 1.0 - rainFactor;
-  float cs = dot(viewDir, sunDir);
-  float dist = 1.0 - cs;
-  float shape2 = 1.0;
-  #ifdef NL_SUN_GLOW_SHAPE
-    vec3 sunR = cross(vec3(0.0, 1.0, 0.0), sunDir);
-    sunR = length(sunR) > 0.001 ? normalize(sunR) : vec3(1.0, 0.0, 0.0);
-    vec2 sunQ = abs(vec2(dot(viewDir, sunR), dot(viewDir, cross(sunDir, sunR)))) + 1e-4;
-    sunQ /= max(sunQ.x, sunQ.y);
-    vec2 sunP = pow(sunQ, vec2_splat(NL_SUN_GLOW_SHAPE));
-    float sunShape = pow(sunP.x + sunP.y, 1.0/NL_SUN_GLOW_SHAPE)/length(sunQ); // same p-norm as the sky glow
-    shape2 = mix(sunShape*sunShape, 1.0, 0.65);             // weaker squareness
-    shape2 = mix(shape2, 1.0, smoothstep(0.0, 0.05, dist)); // quickly round off away from the core
-  #endif
-  float q0 = 1.0/(1.0 + 4.0*dist);              // round halo
-  float q1 = 1.0/(1.0 + 10.0*dist);             // round halo
-  float q2 = 1.0/(1.0 + 28.0*dist*shape2);      // only the core follows the sun shape
-  float bloom = cs > 0.0 ? 0.105*q0*q0 + 0.265*q1*q1 + 0.35*q2*q2 : 0.0;
-  float dd = max(sunDir.y, 0.0);
-  float sunUp = 1.0 - (1.0 - dd*dd)*(1.0 - dd*dd)*(1.0 - dd*dd); // 0 at dawn/night, fades in as dawn fades out
-  return bloom*sunUp*vec3(0.85, 0.95, 1.0)*rainMask2;
-}
-#endif
-
 vec3 nlRenderSky(nl_skycolor skycol, nl_environment env, vec3 viewDir, float t, bool isSkyPlane) {
   vec3 sky;
   viewDir.y = -viewDir.y;
@@ -239,11 +211,6 @@ vec3 nlRenderSky(nl_skycolor skycol, nl_environment env, vec3 viewDir, float t, 
     sky = renderEndSky(skycol.horizon, skycol.zenith, viewDir, t);
   } else {
     sky = renderOverworldSky(skycol, env, viewDir, isSkyPlane);
-    #ifdef NL_UNDERWATER_BLOOM
-      if (env.underwater) {
-        sky += NL_UNDERWATER_BLOOM*nlUnderwaterBloom(viewDir, env.sunDir, env.rainFactor);
-      }
-    #endif
   }
 
   return sky;
