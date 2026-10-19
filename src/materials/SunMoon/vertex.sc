@@ -1,5 +1,5 @@
 $input a_position, a_texcoord0
-$output v_texcoord0, v_sunVis
+$output v_texcoord0, v_sunVis, v_underwater
 
 #include <bgfx_shader.sh>
 
@@ -24,6 +24,7 @@ $output v_texcoord0, v_sunVis
 
 void main() {
   v_texcoord0 = a_texcoord0;
+  v_underwater = 0.0;
   v_sunVis = 1.0; // 1.0 = fully visible, only the sun is ever hidden below
   #ifndef INSTANCING
     vec3 pos = a_position;
@@ -61,12 +62,15 @@ void main() {
     vec3 d  = normalize(c);
 
     // the sun is only visible when it is really there: hidden when it is below the horizon (void),
-    // underwater, and in rain. Clear day and dawn are unchanged (factor 1.0), the moon is untouched.
+    // and in rain (above water). Clear day and dawn are unchanged (factor 1.0), the moon is untouched.
     if (isSun) {
       float sunVis = smoothstep(-0.10, 0.0, d.y);
-      sunVis *= 1.0 - smoothstep(0.0, 0.6, detectRain(FogAndDistanceControl.xyz));
-      sunVis *= detectUnderwater(FogColor.rgb, FogAndDistanceControl.xy) ? 0.0 : 1.0;
+      bool uw = detectUnderwater(FogColor.rgb, FogAndDistanceControl.xy);
+      if (!uw) { // rain cannot be read underwater (fog looks like rain), so the real sun stays visible there
+        sunVis *= 1.0 - smoothstep(0.0, 0.6, detectRain(FogAndDistanceControl.xyz));
+      }
       v_sunVis = sunVis;
+      v_underwater = uw ? 1.0 : 0.0;
     }
 
     vec3 cr = cross(vec3(0.0, 1.0, 0.0), d);

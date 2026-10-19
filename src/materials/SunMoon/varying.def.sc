@@ -3,3 +3,4 @@ vec2 a_texcoord0 : TEXCOORD0;
 
 vec2 v_texcoord0 : TEXCOORD0;
 float v_sunVis   : FACTOR0;
+float v_underwater : FACTOR1;

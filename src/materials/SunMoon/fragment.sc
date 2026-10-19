@@ -1,4 +1,4 @@
-$input v_texcoord0, v_sunVis
+$input v_texcoord0, v_sunVis, v_underwater
 
 #include <bgfx_shader.sh>
 
@@ -16,9 +16,10 @@ void main() {
     vec4 color = texture2D(s_SunMoonTexture, v_texcoord0);
     color.rgb *= SunMoonColor.rgb;
     color.rgb *= 4.4*color.rgb;
+    color.rgb *= mix(1.0, 1.35, v_underwater); // brighter real sun underwater
     float tr = 1.0 - SunMoonColor.a;
     color.a *= 1.0 - tr*tr;
-    color.a *= v_sunVis; // sun hidden below the horizon, underwater and in rain (1.0 for the moon)
+    color.a *= v_sunVis; // sun hidden below the horizon, and in rain (1.0 for the moon)
     color.rgb = colorCorrection(color.rgb);
     gl_FragColor = color;
   #else
