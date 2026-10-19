@@ -1,5 +1,5 @@
 #ifndef INSTANCING
-  $input v_worldPos, v_underwaterRainTimeDay, v_streakC
+  $input v_worldPos, v_underwaterRainTimeDay
 #endif
 
 #include <bgfx_shader.sh>
@@ -22,7 +22,6 @@ void main() {
     env.rainFactor = v_underwaterRainTimeDay.y;
     env.dayFactor = v_underwaterRainTimeDay.w;
     env.fogCol = FogColor.rgb;
-    env.streakC = v_streakC;
     env = calculateSunParams(env, TimeOfDay.x);
 
     nl_skycolor skycol = nlOverworldSkyColors(env);

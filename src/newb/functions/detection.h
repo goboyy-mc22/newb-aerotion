@@ -12,7 +12,6 @@ struct nl_environment {
   vec3 sunDir;      // normalized
   vec3 moonDir;     // normalized
   vec3 fogCol;      // [0.0, 1.0]
-  vec2 streakC;     // camera position in the plane perpendicular to the sun, in noise cells (wrapped), for the underwater streaks
 };
 
 bool detectEnd(vec3 FOG_COLOR) {
@@ -80,12 +79,6 @@ nl_environment calculateSunParams(nl_environment env, float TIME_OF_DAY) {
   return env;
 }
 
-// camera position on the horizontal plane (1 cell = ~8 blocks), wrapped to the 32-cell
-// period of the streak noise so it stays small and precise even far from the origin
-vec2 nlStreakCamera(highp vec3 camPos) {
-  return mod(0.12*camPos.xz, 32.0); // 0.12 cell per block: shafts drift slowly while walking
-}
-
 nl_environment nlDetectEnvironment(float TIME_OF_DAY, vec3 FOG_COLOR, vec3 FOG_CONTROL) {
   nl_environment env;
   env.end = detectEnd(FOG_COLOR);
@@ -93,7 +86,6 @@ nl_environment nlDetectEnvironment(float TIME_OF_DAY, vec3 FOG_COLOR, vec3 FOG_C
   env.underwater = detectUnderwater(FOG_COLOR, FOG_CONTROL.xy);
   env.rainFactor = detectRain(FOG_CONTROL.xyz);
   env.fogCol = FOG_COLOR;
-  env.streakC = vec2(0.0, 0.0);
   env = calculateSunParams(env, TIME_OF_DAY);
   return env;
 }
