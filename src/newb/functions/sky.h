@@ -225,13 +225,12 @@ vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
   e /= length(e) + 1e-5;
   vec2 c = streakC + vec2(0.015, -0.012)*t; // camera position in cells + very slow drift
 
-  // thin, long shafts fanning out from the sun (3 layers of different angular density, no noise)
-  float l0 = smoothstep(0.58, 1.00, nlStreakLayer(c + 4.0*e,  vec2(14.0, 10.0), vec2(-8.0, 16.0), vec2(0.0, 1.3)));
-  float l1 = smoothstep(0.68, 1.00, nlStreakLayer(c + 7.5*e,  vec2(16.0, 12.0), vec2(-9.0, 18.0), vec2(2.1, 0.4)));
-  float l2 = smoothstep(0.74, 1.00, nlStreakLayer(c + 11.0*e, vec2(17.0, 13.0), vec2(-10.0, 19.0), vec2(4.0, 2.7)));
-  float rays = 0.55*l0 + 0.30*l1 + 0.15*l2;
+  // thin shafts fanning out from the sun (2 layers, no noise)
+  float l0 = smoothstep(0.70, 1.00, nlStreakLayer(c + 4.0*e,  vec2(14.0, 10.0), vec2(-8.0, 16.0), vec2(0.0, 1.3)));
+  float l1 = smoothstep(0.80, 1.00, nlStreakLayer(c + 7.5*e,  vec2(16.0, 12.0), vec2(-9.0, 18.0), vec2(2.1, 0.4)));
+  float rays = 0.6*l0 + 0.3*l1;
 
-  float q = 1.0/(1.0 + 1.2*(1.0 - cs));         // slow fall-off: shafts reach far from the sun (no acos)
+  float q = 1.0/(1.0 + 4.0*(1.0 - cs));         // shafts fade out at a moderate distance from the sun (no acos)
   float c2 = cs*cs;
   float c4 = c2*c2;
   float c8 = c4*c4;
@@ -241,7 +240,7 @@ vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
   float dd = max(sunDir.y, 0.0);
   float sunUp = 1.0 - (1.0 - dd*dd)*(1.0 - dd*dd)*(1.0 - dd*dd); // 0 at dawn/night, fades in as dawn fades out
 
-  float streaks = (0.7*rays*q*fade + glow + 0.10*q*q*q)*up*sunUp;
+  float streaks = (0.8*rays*q*fade + glow + 0.10*q*q*q)*up*sunUp;
   return streaks*vec3(0.80, 0.91, 1.0);
 }
 #endif
