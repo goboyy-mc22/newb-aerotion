@@ -88,7 +88,7 @@ void main() {
   float rainShadowMask = mix(1.0, 0.25, env.rainFactor);
   float nightShadowMask = mix(1.0, 0.25, 1.0 - smoothstep(-0.12, 0.25, env.dayFactor)); // eased night mask (same curve as the sky)
   // side shadow only exists outdoors, where sun/moon light reaches (skylight); none indoors or in caves
-  float outdoorMask = smoothstep(0.55, 0.85, v_lightmapUV.y);
+  float outdoorMask = smoothstep(0.86, 0.93, v_lightmapUV.y); // full only at skylight level 15 (15/16); 14 and below = indoors/leaking light
   float shadow = smoothstep(0.875, 0.860, pow(v_lightmapUV.y, 2.0));
   shadow = mix(shadow, 0.0, pow(v_lightmapUV.x * 1.2, 6.0));
   diffuse.rgb *= 1.0 - 0.68 * shadow * rainShadowMask * nightShadowMask;
