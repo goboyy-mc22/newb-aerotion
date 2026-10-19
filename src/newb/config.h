@@ -108,7 +108,7 @@
 #define NL_UNDERWATER_BRIGHTNESS 2.0        // 0.0 dark ~ 3.0 bright
 #define NL_CAUSTIC_INTENSITY 1.9             // 0.5 weak ~ 5.0 bright
 #define NL_UNDERWATER_WAVE 0.05               // [toggle] 0.02 subtle ~ 0.6 trippy
-#define NL_UNDERWATER_STREAKS 0.8           // [toggle] 0.3 subtle - 1.0 bright streaks from the sun
+#define NL_UNDERWATER_STREAKS 0.72           // [toggle] 0.3 subtle - 1.0 bright streaks from the sun
 #define NL_UNDERWATER_TINT vec3(1.0,1.5,0.7) // fog tint color when underwater (bright turquoise); old deep blue: vec3(0.4,0.7,1.0)
 
 /* Cloud type */
