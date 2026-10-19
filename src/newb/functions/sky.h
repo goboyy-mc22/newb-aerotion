@@ -225,22 +225,23 @@ vec3 nlUnderwaterStreaks(vec3 viewDir, vec3 sunDir, vec2 streakC, float t) {
   e /= length(e) + 1e-5;
   vec2 c = streakC + vec2(0.015, -0.012)*t; // camera position in cells + very slow drift
 
-  float l0 = smoothstep(0.25, 1.00, nlStreakLayer(c + 3.5*e,  vec2(11.0, 8.0), vec2(-6.0, 13.0), vec2(0.0, 1.3)));
-  float l1 = smoothstep(0.35, 1.05, nlStreakLayer(c + 10.0*e, vec2(15.0, 12.0), vec2(-8.0, 17.0), vec2(2.1, 0.4)));
-  float rays = 0.5*l0*(0.4 + 0.6*l1) + 0.25*l1*(0.3 + 0.7*l0);
+  // wide soft bloom around the sun with very faint, broad shafts inside it (2 layers, no noise)
+  float l0 = smoothstep(0.45, 1.00, nlStreakLayer(c + 4.0*e,  vec2(8.0, 6.0),  vec2(-5.0, 10.0), vec2(0.0, 1.3)));
+  float l1 = smoothstep(0.55, 1.00, nlStreakLayer(c + 7.5*e,  vec2(12.0, 9.0), vec2(-7.0, 13.0), vec2(2.1, 0.4)));
+  float rays = 0.65*l0 + 0.35*l1;
 
-  float q = 1.0/(1.0 + 3.0*(1.0 - cs));         // soft fall-off around the sun (no acos)
-  float c2 = cs*cs;
+  float q = 1.0/(1.0 + 2.0*(1.0 - cs));         // soft fall-off around the sun (no acos)
+  float pc = max(cs, 0.0);
+  float c2 = pc*pc;
   float c4 = c2*c2;
   float c8 = c4*c4;
-  float fade = 1.0 - c8;                         // shafts start well away from the sun: big round core, no line-shaped centre
-  float glow = cs > 0.0 ? 0.20*c4*c2 + 0.22*c8 + 0.20*c8*c8 + 0.10*c4 : 0.0; // large soft glow (the sun is big)
-  float up = 0.35 + 0.65*clamp(0.5 + 0.5*viewDir.y, 0.0, 1.0);
+  float glow = 0.75*c2*pc + 0.40*c8 + 0.30*c8*c8*c8; // big soft bloom + brighter centre, no hard core
+  float up = 0.5 + 0.5*clamp(0.5 + 0.5*viewDir.y, 0.0, 1.0);
   float dd = max(sunDir.y, 0.0);
   float sunUp = 1.0 - (1.0 - dd*dd)*(1.0 - dd*dd)*(1.0 - dd*dd); // 0 at dawn/night, fades in as dawn fades out
 
-  float streaks = (0.85*rays*q*fade + glow + 0.16*q*q*q)*up*sunUp;
-  return streaks*vec3(0.86, 0.93, 1.0); // slightly white-blue
+  float streaks = (glow*(1.0 + 0.35*rays*q) + 0.10*q*q)*up*sunUp;
+  return streaks*vec3(0.88, 0.96, 1.0);
 }
 #endif
 
