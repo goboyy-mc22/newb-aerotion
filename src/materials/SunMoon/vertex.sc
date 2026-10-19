@@ -1,5 +1,5 @@
 $input a_position, a_texcoord0
-$output v_texcoord0, v_sunVis, v_underwater
+$output v_texcoord0, v_sunVis
 
 #include <bgfx_shader.sh>
 
@@ -24,7 +24,6 @@ $output v_texcoord0, v_sunVis, v_underwater
 
 void main() {
   v_texcoord0 = a_texcoord0;
-  v_underwater = 0.0;
   v_sunVis = 1.0; // 1.0 = fully visible, only the sun is ever hidden below
   #ifndef INSTANCING
     vec3 pos = a_position;
@@ -70,7 +69,6 @@ void main() {
         sunVis *= 1.0 - smoothstep(0.0, 0.6, detectRain(FogAndDistanceControl.xyz));
       }
       v_sunVis = sunVis;
-      v_underwater = uw ? 1.0 : 0.0;
     }
 
     vec3 cr = cross(vec3(0.0, 1.0, 0.0), d);
