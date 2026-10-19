@@ -204,13 +204,25 @@ vec3 nlRenderEndFog(nl_skycolor skycol, vec3 viewDir) {
 }
 
 #ifdef NL_UNDERWATER_BLOOM
-// Underwater sun bloom: a wide, soft, round glow around the sun (no rays, no noise, no acos/exp/pow).
-// Two stacked falloffs: a wide halo and a tighter, brighter centre.
+// Underwater sun bloom: a wide, soft glow around the sun (no rays, no noise, no acos/exp/pow) that follows the
+// shape of the sun (rounded square, NL_SUN_GLOW_SHAPE) like the sky's own glow. Two stacked falloffs: a wide halo
+// (only partly shaped, so it fades to round) and a tighter, brighter centre (fully shaped).
 vec3 nlUnderwaterBloom(vec3 viewDir, vec3 sunDir) {
   float cs = dot(viewDir, sunDir);
-  float q1 = 1.0/(1.0 + 14.0*(1.0 - cs));
-  float q2 = 1.0/(1.0 + 60.0*(1.0 - cs));
-  float bloom = cs > 0.0 ? 0.30*q1*q1 + 0.25*q2*q2 : 0.0;
+  float dist = 1.0 - cs;
+  float shape2 = 1.0;
+  #ifdef NL_SUN_GLOW_SHAPE
+    vec3 sunR = cross(vec3(0.0, 1.0, 0.0), sunDir);
+    sunR = length(sunR) > 0.001 ? normalize(sunR) : vec3(1.0, 0.0, 0.0);
+    vec2 sunQ = abs(vec2(dot(viewDir, sunR), dot(viewDir, cross(sunDir, sunR)))) + 1e-4;
+    sunQ /= max(sunQ.x, sunQ.y);
+    vec2 sunP = pow(sunQ, vec2_splat(NL_SUN_GLOW_SHAPE));
+    float sunShape = pow(sunP.x + sunP.y, 1.0/NL_SUN_GLOW_SHAPE)/length(sunQ); // same p-norm as the sky glow
+    shape2 = sunShape*sunShape;
+  #endif
+  float q1 = 1.0/(1.0 + 9.0*dist*mix(1.0, shape2, 0.4));
+  float q2 = 1.0/(1.0 + 30.0*dist*shape2);
+  float bloom = cs > 0.0 ? 0.38*q1*q1 + 0.40*q2*q2 : 0.0;
   float dd = max(sunDir.y, 0.0);
   float sunUp = 1.0 - (1.0 - dd*dd)*(1.0 - dd*dd)*(1.0 - dd*dd); // 0 at dawn/night, fades in as dawn fades out
   return bloom*sunUp*vec3(0.80, 0.93, 1.0);
