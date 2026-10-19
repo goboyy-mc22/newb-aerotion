@@ -18,7 +18,7 @@ vec3 spectrum(float x) {
 }
 
 vec3 getUnderwaterCol(vec3 FOG_COLOR) {
-  return 1.0*NL_UNDERWATER_TINT*FOG_COLOR*FOG_COLOR;
+  return 2.0*NL_UNDERWATER_TINT*FOG_COLOR*FOG_COLOR;
 }
 
 vec3 getEndZenithCol() {
