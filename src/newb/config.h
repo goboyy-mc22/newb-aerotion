@@ -109,7 +109,6 @@
 #define NL_CAUSTIC_INTENSITY 1.9             // 0.5 weak ~ 5.0 bright
 #define NL_UNDERWATER_WAVE 0.05               // [toggle] 0.02 subtle ~ 0.6 trippy
 #define NL_UNDERWATER_BLOOM 1.0             // [toggle] 0.5 subtle ~ 1.5 bright soft bloom around the sun underwater (no rays)
-#define NL_UNDERWATER_CLARITY 2.5           // [toggle] 1.0 original ~ 4.0 very clear (how far you can see underwater)
 #define NL_UNDERWATER_CLEAR 0.55            // [toggle] 0.0 grey ~ 1.0 original color (lower = clearer, less blue/green)
 #define NL_UNDERWATER_CLEAR_GAIN 1.3        // brightness of the clear water color
 #define NL_UNDERWATER_TINT vec3(0.75,1.05,1.10) // fog tint color when underwater (bright, slightly blue; old: vec3(0.45,0.7,0.9))
