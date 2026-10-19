@@ -61,13 +61,11 @@ void main() {
     vec3 d  = normalize(c);
 
     // the sun is only visible when it is really there: hidden when it is below the horizon (void),
-    // and in rain (above water). Clear day and dawn are unchanged (factor 1.0), the moon is untouched.
+    // underwater, and in rain. Clear day and dawn are unchanged (factor 1.0), the moon is untouched.
     if (isSun) {
       float sunVis = smoothstep(-0.10, 0.0, d.y);
-      bool uw = detectUnderwater(FogColor.rgb, FogAndDistanceControl.xy);
-      if (!uw) { // rain cannot be read underwater (fog looks like rain), so the real sun stays visible there
-        sunVis *= 1.0 - smoothstep(0.0, 0.6, detectRain(FogAndDistanceControl.xyz));
-      }
+      sunVis *= 1.0 - smoothstep(0.0, 0.6, detectRain(FogAndDistanceControl.xyz));
+      sunVis *= detectUnderwater(FogColor.rgb, FogAndDistanceControl.xy) ? 0.0 : 1.0;
       v_sunVis = sunVis;
     }
 
