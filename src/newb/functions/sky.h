@@ -150,6 +150,12 @@ vec3 renderOverworldSky(nl_skycolor skyCol, nl_environment env, vec3 viewDir, bo
     sky *= 1.0 + 17.0*source*(1.0-env.rainFactor);
   }
 
+  // underwater the sky colors are uniform, so the sun glow above would be invisible: add a round bloom around the sun
+  if (env.underwater) {
+    float r4 = g2.x*g2.x; // g2 is the round falloff (g1*g1), r4 is wide, r8 is tight
+    sky += (0.9*r4*r4 + 0.25*r4)*mask*vec3(0.80, 0.93, 1.0);
+  }
+
   #ifdef NL_RAINBOW
     if (!env.underwater) {
       float rainbowFade = 0.5 + 0.5*viewDir.y;
