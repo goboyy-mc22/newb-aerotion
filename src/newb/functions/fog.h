@@ -7,6 +7,13 @@ float nlRenderFogFade(float relativeDist, vec3 FOG_COLOR, vec2 FOG_CONTROL) {
 
     // misty effect
     float density = NL_MIST_DENSITY*(19.0 - 18.0*FOG_COLOR.g);
+    #ifdef NL_UNDERWATER_FOG
+      // thinner fog underwater only
+      if (detectUnderwater(FOG_COLOR, FOG_CONTROL)) {
+        fade *= NL_UNDERWATER_FOG;
+        density *= NL_UNDERWATER_FOG;
+      }
+    #endif
     fade += (1.0-fade)*(0.3-0.3*exp(-relativeDist*relativeDist*density));
 
     return NL_FOG * fade;

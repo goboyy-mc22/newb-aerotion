@@ -63,10 +63,6 @@ nl_skycolor nlOverworldSkyColors(nl_environment env) {
 
   if (env.underwater) {
     vec3 underwaterFog = env.fogCol*env.fogCol*NL_UNDERWATER_TINT;
-    #ifdef NL_UNDERWATER_CLEAR
-      // clear water: less saturated (not too blue, not green) and brighter
-      underwaterFog = NL_UNDERWATER_CLEAR_GAIN*mix(vec3_splat(dot(underwaterFog, vec3(0.33,0.33,0.33))), underwaterFog, NL_UNDERWATER_CLEAR);
-    #endif
     s.zenith = mix(2.0*underwaterFog, underwaterFog*zh, 0.8);
     s.horizon = mix(2.0*underwaterFog, underwaterFog*hh, 0.8);
     s.horizonEdge = s.horizon;
