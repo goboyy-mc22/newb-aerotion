@@ -91,7 +91,7 @@ void main() {
   float outdoorMask = smoothstep(0.86, 0.93, v_lightmapUV.y); // full only at skylight level 15 (15/16); 14 and below = indoors/leaking light
   float shadow = smoothstep(0.875, 0.860, pow(v_lightmapUV.y, 2.0));
   shadow = mix(shadow, 0.0, pow(v_lightmapUV.x * 1.2, 6.0));
-  diffuse.rgb *= 1.0 - 0.68 * shadow * rainShadowMask * nightShadowMask;
+  diffuse.rgb *= 1.0 - 0.75 * shadow * rainShadowMask * nightShadowMask;
 
   if (v_extra.b <= 0.9) {
     float sideshadow = smoothstep(0.64, 0.62, v_color1.g);
