@@ -23,6 +23,12 @@ float nlRenderFogFade(float relativeDist, vec3 FOG_COLOR, vec2 FOG_CONTROL) {
 }
 
 float nlRenderGodRayIntensity(vec3 cPos, vec3 worldPos, float t, vec2 uv1, float relativeDist, vec3 FOG_COLOR, float rainFactor) {
+  // the result is multiplied by these two factors below, so it is exactly 0 outside dawn/dusk and in rain:
+  // skip the expensive part (same result, much cheaper for most of the day)
+  if (clamp(3.0*(FOG_COLOR.r-FOG_COLOR.b), 0.0, 1.0)*(1.0 - smoothstep(0.0, 0.3, rainFactor)) <= 0.0) {
+    return 0.0;
+  }
+
   // offset wPos (only works upto 16 blocks)
   vec3 offset = cPos - 16.0*fract(worldPos*0.0625);
   offset = abs(2.0*fract(offset*0.0625)-1.0);

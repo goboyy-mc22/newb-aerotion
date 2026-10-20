@@ -150,12 +150,15 @@ void main() {
         mask *= mix(1.0, 0.4 + 3.0*pud, NL_GROUND_RAIN_PUDDLES);
 
         // rain ripples inside puddles: one expanding ring per cell
-        vec2 rc = pp*2.2;
-        vec2 rcell = floor(rc);
-        vec2 rf = fract(rc) - 0.5 + (vec2(puddleHash(rcell + 3.0), puddleHash(rcell + 7.0)) - 0.5)*0.4;
-        float rph = fract(0.6*ViewPositionAndTime.w + puddleHash(rcell));
-        float ring = clamp(1.0 - abs(length(rf) - 0.5*rph)/0.07, 0.0, 1.0)*(1.0 - rph);
-        mask += 0.2*ring*pud*env.rainFactor*NL_GROUND_RAIN_PUDDLES;
+        // (the ring is multiplied by rainFactor, so without rain it adds nothing: skip it)
+        if (env.rainFactor > 0.0) {
+          vec2 rc = pp*2.2;
+          vec2 rcell = floor(rc);
+          vec2 rf = fract(rc) - 0.5 + (vec2(puddleHash(rcell + 3.0), puddleHash(rcell + 7.0)) - 0.5)*0.4;
+          float rph = fract(0.6*ViewPositionAndTime.w + puddleHash(rcell));
+          float ring = clamp(1.0 - abs(length(rf) - 0.5*rph)/0.07, 0.0, 1.0)*(1.0 - rph);
+          mask += 0.2*ring*pud*env.rainFactor*NL_GROUND_RAIN_PUDDLES;
+        }
 
         diffuse.rgb *= 1.0 - 0.35*pud*env.rainFactor*NL_GROUND_RAIN_PUDDLES;
       #endif
