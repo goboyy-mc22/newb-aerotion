@@ -95,7 +95,10 @@ vec3 nlLighting(
 
     // sky ambient
     lum = luminance(light);
-    light += (skycol.horizon + skycol.zenith)*(uv1.y/(1.0+lum));
+    // less blue in shadow (wood and sand stay warm); 1.0 = sky color as before, 0.0 = grey
+    vec3 skyAmbient = skycol.horizon + skycol.zenith;
+    skyAmbient = mix(vec3_splat(luminance(skyAmbient)), skyAmbient, NL_SHADOW_AMBIENT_COLOR);
+    light += skyAmbient*(uv1.y/(1.0+lum));
 
   }
 
