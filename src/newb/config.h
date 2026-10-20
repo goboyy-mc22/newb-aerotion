@@ -105,11 +105,11 @@
 #define NL_WATER_TINT vec3(0.0,0.1,0.9)
 
 /* Underwater */
-#define NL_UNDERWATER_BRIGHTNESS 2.2        // 0.0 dark ~ 3.0 bright
-#define NL_CAUSTIC_INTENSITY 0.0             // 0.5 weak ~ 5.0 bright
+#define NL_UNDERWATER_BRIGHTNESS 2.5        // 0.0 dark ~ 3.0 bright
+#define NL_CAUSTIC_INTENSITY 2.0             // 0.5 weak ~ 5.0 bright
 #define NL_UNDERWATER_WAVE 0.05               // [toggle] 0.02 subtle ~ 0.6 super wave
-#define NL_UNDERWATER_TINT vec3(1.8,1.3,1.2) // fog tint color when underwater
-#define NL_UNDERWATER_FOG 0.5               // [toggle] 1.0 original ~ 0.0 no fog underwater (lower = thinner fog, underwater only)
+#define NL_UNDERWATER_TINT vec3(1.4,1.55,1.2) // fog tint color when underwater
+#define NL_UNDERWATER_FOG 0.25               // [toggle] 1.0 original ~ 0.0 no fog underwater (lower = thinner fog, underwater only)
 
 /* Cloud type */
 #define NL_CLOUD_TYPE 0 // 0:vanilla, 1:soft, 2:rounded, 3:realistic
