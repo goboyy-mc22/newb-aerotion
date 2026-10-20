@@ -201,46 +201,31 @@
 
 #ifdef LOW
   // reduced values
+  #undef NL_FOG
+  #define NL_FOG 0.5
+
   #undef NL_MIST_DENSITY
-  #define NL_MIST_DENSITY 0.5
+  #define NL_MIST_DENSITY 0.3
 
   #undef NL_RAIN_MIST_OPACITY
-  #define NL_RAIN_MIST_OPACITY 0.5
+  #define NL_RAIN_MIST_OPACITY 0.3
 
   #undef NL_CLOUDY_FOG
-  #define NL_CLOUDY_FOG 0.2
+  #define NL_CLOUDY_FOG 0.15
 
   #undef NL_GLOW_TEX
-  #define NL_GLOW_TEX 2.8
+  #define NL_GLOW_TEX 2.5
 
   #undef NL_GLOW_SHIMMER
   #define NL_GLOW_SHIMMER 0.5
 
   #undef NL_PLANTS_WAVE
-  #define NL_PLANTS_WAVE 0.025
-
   #undef NL_LANTERN_WAVE
-  #define NL_LANTERN_WAVE 0.1
-
-  #undef NL_WAVE_RANGE
-  #define NL_WAVE_RANGE 8.0 // distance in blocks
-
   #undef NL_WATER_BUMP
-  #define NL_WATER_BUMP 0.025
-
   #undef NL_UNDERWATER_WAVE
-  #define NL_UNDERWATER_WAVE 0.025
-
   #undef NL_GROUND_RAIN_WETNESS
-  #define NL_GROUND_RAIN_WETNESS 0.25
-
   #undef NL_GROUND_RAIN_PUDDLES
-  #define NL_GROUND_RAIN_PUDDLES 0.25
-
   #undef NL_LAVA_NOISE_BUMP
-  #define NL_LAVA_NOISE_BUMP 0.2
-
-  // heavy functions off (only the ones enabled in the main config)
   #undef NL_GODRAY
   #undef NL_WATER_WAVE
 #endif
