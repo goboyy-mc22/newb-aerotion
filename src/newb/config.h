@@ -221,7 +221,10 @@
 
   #undef NL_PLANTS_WAVE
   #undef NL_LANTERN_WAVE
+
   #undef NL_WATER_BUMP
+  #define NL_WATER_BUMP 0.001
+
   #undef NL_UNDERWATER_WAVE
   #undef NL_GROUND_RAIN_WETNESS
   #undef NL_GROUND_RAIN_PUDDLES
