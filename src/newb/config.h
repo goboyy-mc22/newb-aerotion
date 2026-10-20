@@ -214,10 +214,10 @@
   #define NL_CLOUDY_FOG 0.15
 
   #undef NL_GLOW_TEX
-  #define NL_GLOW_TEX 2.5
+  #define NL_GLOW_TEX 2.2
 
   #undef NL_GLOW_SHIMMER
-  #define NL_GLOW_SHIMMER 0.5
+  #define NL_GLOW_SHIMMER 0.35
 
   #undef NL_PLANTS_WAVE
   #undef NL_LANTERN_WAVE
@@ -226,8 +226,13 @@
   #define NL_WATER_BUMP 0.001
 
   #undef NL_UNDERWATER_WAVE
+
   #undef NL_GROUND_RAIN_WETNESS
+  #define NL_GROUND_RAIN_WETNESS 0.0
+
   #undef NL_GROUND_RAIN_PUDDLES
+  #define NL_GROUND_RAIN_PUDDLES 0.0
+
   #undef NL_LAVA_NOISE_BUMP
   #undef NL_GODRAY
   #undef NL_WATER_WAVE
