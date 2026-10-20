@@ -19,7 +19,7 @@ void main() {
     env.end = false;
     env.nether = false;
     env.underwater = v_underwaterRainTimeDay.x > 0.5;
-    env.rainFactor = v_underwaterRainTimeDay.y;
+    env.rainFactor = env.underwater ? 0.0 : v_underwaterRainTimeDay.y; // rain cannot be read underwater (fog looks like rain)
     env.dayFactor = v_underwaterRainTimeDay.w;
     env.fogCol = FogColor.rgb;
     env = calculateSunParams(env, TimeOfDay.x);
