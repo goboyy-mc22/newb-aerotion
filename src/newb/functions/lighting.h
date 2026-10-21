@@ -95,10 +95,7 @@ vec3 nlLighting(
 
     // sky ambient
     lum = luminance(light);
-    // only in shade (no direct sun light): same brightness, but grey instead of sky blue. Sunlit blocks are unchanged.
-    vec3 skyAmbient = skycol.horizon + skycol.zenith;
-    skyAmbient = mix(vec3_splat(luminance(skyAmbient)), skyAmbient, smoothstep(0.0, 1.0, lum));
-    light += skyAmbient*(uv1.y/(1.0+lum));
+    light += (skycol.horizon + skycol.zenith)*(uv1.y/(1.0+lum));
 
   }
 
