@@ -96,19 +96,19 @@
 #define NL_WAVE_RANGE 13.0     // 6.0 upto 6 blocks ~ 32.0 upto 32 blocks away (slower)
 
 /* Water */
-#define NL_WATER_TRANSPARENCY 0.5 // 0.0 transparent ~ 1.0 normal
+#define NL_WATER_TRANSPARENCY 0.2 // 0.0 transparent ~ 1.0 normal
 #define NL_WATER_BUMP 0.05        // 0.001 plain ~ 0.2 bumpy water
 #define NL_WATER_WAVE_SPEED  0.7  // 0.2 calm ~ 2.0 turbulent
 #define NL_WATER_TEX_OPACITY 0.0  // 0.0 plain water ~ 1.0 vanilla water texture
 #define NL_WATER_WAVE             // [toggle] wave effect
 //#define NL_WATER_REFL_MASK      // [toggle] fake water reflection mask
-#define NL_WATER_TINT vec3(0.0,0.1,0.9)
+#define NL_WATER_TINT vec3(0.3,1.2,2.2)
 
 /* Underwater */
 #define NL_UNDERWATER_BRIGHTNESS 2.5        // 0.0 dark ~ 3.0 bright
 #define NL_CAUSTIC_INTENSITY 2.0             // 0.5 weak ~ 5.0 bright
 #define NL_UNDERWATER_WAVE 0.05               // [toggle] 0.02 subtle ~ 0.6 super wave
-#define NL_UNDERWATER_TINT vec3(1.4,1.55,1.2) // fog tint color when underwater
+#define NL_UNDERWATER_TINT vec3(2.4,1.8,1.6) // fog tint color when underwater
 #define NL_UNDERWATER_FOG 0.25               // [toggle] 1.0 original ~ 0.0 no fog underwater (lower = thinner fog, underwater only)
 
 /* Cloud type */
