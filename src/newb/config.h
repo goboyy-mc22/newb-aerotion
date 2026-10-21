@@ -14,7 +14,6 @@
 #define NL_SUNLIGHT_INTENSITY   3.9  // 1.0 weak ~ 5.0 bright
 #define NL_TORCHLIGHT_INTENSITY 1.5 // 0.5 weak ~ 3.0 bright
 #define NL_SHADOW_INTENSITY     1.0  // 0.0 no shadow ~ 1.0 strong shadow
-#define NL_SHADOW_AMBIENT_COLOR 0.3  // 0.0 grey ~ 1.0 sky colored (blue) ambient light inside shadows
 #define NL_MIN_LIGHTING_BOOST   0.05  // 1.0 minimal lighting boost for dark areas ~ 3.0 brighter dark areas
 //#define NL_BLINKING_TORCH  // [toggle] flickering light
 //#define NL_CLOUD_SHADOW      // [toggle] cloud shadow (simple clouds only)
