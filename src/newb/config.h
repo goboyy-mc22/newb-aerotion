@@ -102,7 +102,7 @@
 #define NL_WATER_TEX_OPACITY 0.0  // 0.0 plain water ~ 1.0 vanilla water texture
 #define NL_WATER_WAVE             // [toggle] wave effect
 //#define NL_WATER_REFL_MASK      // [toggle] fake water reflection mask
-#define NL_WATER_TINT vec3(0.3,1.2,2.2)
+#define NL_WATER_TINT vec3(0.7,1.3,1.6)
 
 /* Underwater */
 #define NL_UNDERWATER_BRIGHTNESS 2.5        // 0.0 dark ~ 3.0 bright
