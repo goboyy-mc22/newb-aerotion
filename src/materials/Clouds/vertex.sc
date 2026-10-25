@@ -57,6 +57,12 @@ void main() {
       color.rgb = colorCorrection(color.rgb);
       color.a = NL_CLOUD0_OPACITY * (1.0 - cloudFadeY) * fog_fade(worldPos.xyz);
 
+      #if defined(NL_SKY_CLOUDS) && defined(NL_SKY_CLOUDS_ONLY)
+        // the sky clouds replace the vanilla cloud mesh
+        worldPos = vec3(0.0,0.0,0.0);
+        color.a = 0.0;
+      #endif
+
       // clouds.png has two non-overlaping layers:
       // r=unused, g=layers, b=reference, a=unused
       // g=0 (layer 0), g=1 (layer 1)

@@ -161,6 +161,7 @@
 
 /* Sky clouds (bicubic style, painted on the sky dome, adapted from clouds_bicubic) */
 #define NL_SKY_CLOUDS                     // [toggle] layered procedural clouds on the sky
+#define NL_SKY_CLOUDS_ONLY                // [toggle] hide the normal (type 0) clouds while sky clouds are on
 #define NL_SKY_CLOUDS_LAYERS 6            // layers = volume and cost (4 ~ 12). Mobile: 5
 #define NL_SKY_CLOUDS_LOD_Y 0.06          // fewer octaves near the horizon (0.04 faithful ~ 0.08 fast)
 #define NL_SKY_CLOUDS_SCALE 0.7           // higher = smaller clouds
