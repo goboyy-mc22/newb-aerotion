@@ -159,6 +159,19 @@
 #define NL_AURORA_COL1 vec3(0.1,1.0,0.0)
 #define NL_AURORA_COL2 vec3(0.1,0.0,1.0)
 
+/* Sky clouds (bicubic style, painted on the sky dome, adapted from clouds_bicubic) */
+#define NL_SKY_CLOUDS                     // [toggle] layered procedural clouds on the sky
+#define NL_SKY_CLOUDS_LAYERS 6            // layers = volume and cost (4 ~ 12). Mobile: 5
+#define NL_SKY_CLOUDS_LOD_Y 0.06          // fewer octaves near the horizon (0.04 faithful ~ 0.08 fast)
+#define NL_SKY_CLOUDS_SCALE 0.7           // higher = smaller clouds
+#define NL_SKY_CLOUDS_DENSITY 1.8         // higher = FEWER clouds (1.2 many ~ 2.4 few)
+#define NL_SKY_CLOUDS_SPEED 1.0           // wind speed
+#define NL_SKY_CLOUDS_LAYER_SQUEEZE 0.045 // spacing between layers (volume)
+#define NL_SKY_CLOUDS_AMBIENT_MIX 0.25    // how much lower layers darken (0.0 ~ 1.0)
+#define NL_SKY_CLOUDS_BRIGHTNESS 3.0      // brightness of the lit side
+#define NL_SKY_CLOUDS_SATURATION 0.4      // 0.0 white/grey ~ 1.0 sky coloured
+#define NL_SKY_CLOUDS_HORIZON_FADE 0.5    // clouds fade out until this height
+
 //#define NL_CLOUD_AURORA_REFLECTION // [toggle] simple clouds/aurora reflection
 
 /* Chunk loading slide in animation */
@@ -232,6 +245,8 @@
 
   #undef NL_GROUND_RAIN_PUDDLES
   #define NL_GROUND_RAIN_PUDDLES 0.0
+
+  #undef NL_SKY_CLOUDS
 
   #undef NL_LAVA_NOISE_BUMP
   #undef NL_GODRAY
