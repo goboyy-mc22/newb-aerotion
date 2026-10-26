@@ -112,7 +112,7 @@
 #define NL_UNDERWATER_FOG 0.2               // [toggle] 1.0 original ~ 0.0 no fog underwater (lower = thinner fog, underwater only)
 
 /* Cloud type */
-#define NL_CLOUD_TYPE 0 // 0:vanilla, 1:soft, 2:rounded, 3:realistic
+#define NL_CLOUD_TYPE 0 // 0:vanilla, 1:soft, 2:rounded, 3:realistic, 4:bicubic
 
 /* Vanilla cloud settings - make sure to remove clouds.png when using this */
 #define NL_CLOUD0_THICKNESS 1.5     // 0.5 slim ~ 8.0 fat
@@ -150,6 +150,19 @@
 #define NL_CLOUD3_SPEED 0.005            // 0.0 static ~ 4.0 fast moving
 #define NL_CLOUD3_SHADOW 0.9             // 0.1 subtle ~ 1.0 dark
 #define NL_CLOUD3_SHADOW_OFFSET 0.3      // 0.05 minimal ~ 1.0 large
+
+/* Bicubic cloud settings (painted on the sky dome) */
+#define NL_CLOUD4_NOISE_TEX           // [toggle] noise from texture (1 read) instead of math
+#define NL_CLOUD4_NOISE_CELLS 16.0    // voronoi cells of the texture (do NOT change without regenerating it)
+#define NL_CLOUD4_LAYERS 10           // layers = volume and cost (4 ~ 12). Mobile: 5
+#define NL_CLOUD4_LOD_Y 0.06          // fewer octaves near the horizon (0.04 faithful ~ 0.08 fast)
+#define NL_CLOUD4_SCALE 0.7           // higher = smaller clouds
+#define NL_CLOUD4_DENSITY 1.8         // higher = FEWER clouds (1.2 many ~ 2.4 few)
+#define NL_CLOUD4_SPEED 1.0           // wind speed
+#define NL_CLOUD4_LAYER_SQUEEZE 0.045 // layer separation (volume)
+#define NL_CLOUD4_AMBIENT_MIX 0.2     // how much lower layers darken (0.0 ~ 1.0)
+#define NL_CLOUD4_BRIGHTNESS 1.5      // brightness of the lit side
+#define NL_CLOUD4_HORIZON_FADE 0.5    // clouds fade out up to this height
 
 /* Aurora settings */
 //#define NL_AURORA 1.2           // [toggle] 0.4 dim ~ 4.0 very bright
@@ -212,6 +225,9 @@
 
   #undef NL_CLOUDY_FOG
   #define NL_CLOUDY_FOG 0.15
+
+  #undef NL_CLOUD4_LAYERS
+  #define NL_CLOUD4_LAYERS 5
 
   #undef NL_GLOW_TEX
   #define NL_GLOW_TEX 2.2
