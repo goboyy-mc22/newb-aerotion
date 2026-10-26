@@ -28,13 +28,6 @@ void main() {
 
     vec3 skyColor = nlRenderSky(skycol, env, -viewDir, v_underwaterRainTimeDay.z, true);
 
-    #ifdef NL_SKY_CLOUDS
-      if (!env.underwater && env.rainFactor < 0.99) {
-        vec3 withClouds = nlSkyClouds(skyColor, -viewDir, v_underwaterRainTimeDay.z, skycol.horizon, skycol.zenith, gl_FragCoord.xy);
-        skyColor = mix(withClouds, skyColor, env.rainFactor);
-      }
-    #endif
-
     skyColor = colorCorrection(skyColor);
 
     gl_FragColor = vec4(skyColor, 1.0);
