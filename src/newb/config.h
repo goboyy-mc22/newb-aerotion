@@ -226,8 +226,8 @@
   #undef NL_CLOUDY_FOG
   #define NL_CLOUDY_FOG 0.15
 
-  #undef NL_CLOUD4_LAYERS
-  #define NL_CLOUD4_LAYERS 5
+  #undef NL_CLOUD_TYPE
+  #define NL_CLOUD_TYPE 0
 
   #undef NL_GLOW_TEX
   #define NL_GLOW_TEX 2.2
