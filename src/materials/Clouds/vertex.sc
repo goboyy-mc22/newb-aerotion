@@ -42,7 +42,16 @@ void main() {
   vec3 pos = a_position;
   vec3 worldPos;
 
-  #if NL_CLOUD_TYPE <= 2
+  #if NL_CLOUD_TYPE == 4
+
+    // type 4 is painted on the sky dome (Sky/fragment.sc): hide the cloud mesh
+    v_dayFactor = 0.0;
+    v_color0 = vec4(0.0, 0.0, 0.0, 0.0);
+    v_color1 = vec4(0.0, 0.0, 0.0, 0.0);
+    v_color2 = vec4(0.0, 0.0, 0.0, 0.0);
+    gl_Position = vec4(0.0, 0.0, 0.0, 0.0);
+
+  #elif NL_CLOUD_TYPE <= 2
 
     vec4 color;
 

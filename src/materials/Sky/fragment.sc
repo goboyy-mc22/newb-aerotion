@@ -6,6 +6,7 @@
 
 #ifndef INSTANCING
   #include <newb/main.sh>
+  #include <newb/functions/skyclouds.h>
   uniform vec4 TimeOfDay;
   uniform vec4 FogColor;
   uniform vec4 FogAndDistanceControl;
@@ -27,6 +28,14 @@ void main() {
     nl_skycolor skycol = nlOverworldSkyColors(env);
 
     vec3 skyColor = nlRenderSky(skycol, env, -viewDir, v_underwaterRainTimeDay.z, true);
+
+    #if NL_CLOUD_TYPE == 4
+      // bicubic clouds painted on the sky dome (the Clouds material draws nothing for this type)
+      if (!env.underwater && env.rainFactor < 0.99) {
+        vec3 withClouds = bsbeClouds(skyColor, viewDir, v_underwaterRainTimeDay.z, skycol.horizon, skycol.zenith, gl_FragCoord.xy);
+        skyColor = mix(withClouds, skyColor, env.rainFactor);
+      }
+    #endif
 
     skyColor = colorCorrection(skyColor);
 
