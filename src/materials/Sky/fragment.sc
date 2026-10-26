@@ -6,10 +6,39 @@
 
 #ifndef INSTANCING
   #include <newb/main.sh>
-  #include <newb/functions/skyclouds.h>
+  #include <newb/functions/cloudnoise.h>
   uniform vec4 TimeOfDay;
   uniform vec4 FogColor;
   uniform vec4 FogAndDistanceControl;
+#endif
+
+// sky clouds generator (cloud type 4), helpers are in functions/cloudnoise.h
+#ifndef INSTANCING
+  #ifdef NL_SKY_CLOUDS
+
+  vec3 bsbeClouds(vec3 color, vec3 nPos, float fTime, vec3 horC, vec3 zenC, vec2 fragCoord) {
+    vec2 cloudP = (nPos.xz / nPos.y) * NL_SKY_CLOUDS_SCALE;
+    cloudP -= cloudP * bsbeHash(fragCoord.x + fragCoord.y * 57.0) * 0.05;
+
+    float sDens = NL_SKY_CLOUDS_DENSITY;
+    vec3 cloDirC = horC * NL_SKY_CLOUDS_BRIGHTNESS;
+    vec3 cloAmbC = bsbeSatur(zenC, 0.7);
+
+    float lodY = nPos.y / NL_SKY_CLOUDS_LOD_Y;
+    int nOct = int(step(1.0, lodY) + step(1.58, lodY) + step(2.5, lodY) + step(3.95, lodY));
+    if (nOct > 0) {
+      for (int i = 0; i < NL_SKY_CLOUDS_LAYERS; i++) {
+        float cloudM = bsbeFbm(cloudP, sDens, fTime, nOct);
+        cloDirC = mix(cloDirC, cloAmbC, NL_SKY_CLOUDS_AMBIENT_MIX);
+        color = mix(color, cloDirC, cloudM * smoothstep(0.0, NL_SKY_CLOUDS_HORIZON_FADE, nPos.y));
+        sDens += (i <= 6) ? -0.1 : 0.1;
+        cloudP -= cloudP * NL_SKY_CLOUDS_LAYER_SQUEEZE;
+      }
+    }
+    return color;
+  }
+
+  #endif
 #endif
 
 void main() {
