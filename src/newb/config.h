@@ -154,15 +154,15 @@
 /* Bicubic cloud settings (painted on the sky dome) */
 #define NL_CLOUD4_NOISE_TEX           // [toggle] noise from texture (1 read) instead of math
 #define NL_CLOUD4_NOISE_CELLS 16.0    // voronoi cells of the texture (do NOT change without regenerating it)
-#define NL_CLOUD4_LAYERS 10           // layers = volume and cost (4 ~ 12). Mobile: 5
-#define NL_CLOUD4_LOD_Y 0.06          // fewer octaves near the horizon (0.04 faithful ~ 0.08 fast)
-#define NL_CLOUD4_SCALE 0.7           // higher = smaller clouds
-#define NL_CLOUD4_DENSITY 1.8         // higher = FEWER clouds (1.2 many ~ 2.4 few)
-#define NL_CLOUD4_SPEED 1.0           // wind speed
-#define NL_CLOUD4_LAYER_SQUEEZE 0.045 // layer separation (volume)
-#define NL_CLOUD4_AMBIENT_MIX 0.2     // how much lower layers darken (0.0 ~ 1.0)
-#define NL_CLOUD4_BRIGHTNESS 1.5      // brightness of the lit side
-#define NL_CLOUD4_HORIZON_FADE 0.5    // clouds fade out up to this height
+#define NL_CLOUD4_LAYERS 6           // layers = volume and cost (4 ~ 12). Mobile: 5
+#define NL_CLOUD4_LOD_Y 0.065          // fewer octaves near the horizon (0.04 faithful ~ 0.08 fast)
+#define NL_CLOUD4_SCALE 1.25           // higher = smaller clouds
+#define NL_CLOUD4_DENSITY 1.20         // higher = FEWER clouds (1.2 many ~ 2.4 few)
+#define NL_CLOUD4_SPEED 0.1           // wind speed
+#define NL_CLOUD4_LAYER_SQUEEZE 0.025 // layer separation (volume)
+#define NL_CLOUD4_AMBIENT_MIX 0.15     // how much lower layers darken (0.0 ~ 1.0)
+#define NL_CLOUD4_BRIGHTNESS 2.0      // brightness of the lit side
+#define NL_CLOUD4_HORIZON_FADE 1.00    // clouds fade out up to this height
 
 /* Aurora settings */
 //#define NL_AURORA 1.2           // [toggle] 0.4 dim ~ 4.0 very bright
