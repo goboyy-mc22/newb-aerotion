@@ -112,7 +112,7 @@
 #define NL_UNDERWATER_FOG 0.2               // [toggle] 1.0 original ~ 0.0 no fog underwater (lower = thinner fog, underwater only)
 
 /* Cloud type */
-#define NL_CLOUD_TYPE 0 // 0:vanilla, 1:soft, 2:rounded, 3:realistic
+#define NL_CLOUD_TYPE 4 // 0:vanilla, 1:soft, 2:rounded, 3:realistic, 4:sky clouds (needs the CloudsTextures buffer)
 
 /* Vanilla cloud settings - make sure to remove clouds.png when using this */
 #define NL_CLOUD0_THICKNESS 1.5     // 0.5 slim ~ 8.0 fat
@@ -159,18 +159,19 @@
 #define NL_AURORA_COL1 vec3(0.1,1.0,0.0)
 #define NL_AURORA_COL2 vec3(0.1,0.0,1.0)
 
-/* Sky clouds (bicubic style, painted on the sky dome, adapted from clouds_bicubic) */
-#define NL_SKY_CLOUDS                     // [toggle] layered procedural clouds on the sky
-#define NL_SKY_CLOUDS_LAYERS 6            // layers = volume and cost (4 ~ 12). Mobile: 5
-#define NL_SKY_CLOUDS_LOD_Y 0.06          // fewer octaves near the horizon (0.04 faithful ~ 0.08 fast)
-#define NL_SKY_CLOUDS_SCALE 0.7           // higher = smaller clouds
-#define NL_SKY_CLOUDS_DENSITY 1.8         // higher = FEWER clouds (1.2 many ~ 2.4 few)
-#define NL_SKY_CLOUDS_SPEED 1.0           // wind speed
-#define NL_SKY_CLOUDS_LAYER_SQUEEZE 0.045 // spacing between layers (volume)
-#define NL_SKY_CLOUDS_AMBIENT_MIX 0.25    // how much lower layers darken (0.0 ~ 1.0)
-#define NL_SKY_CLOUDS_BRIGHTNESS 3.0      // brightness of the lit side
-#define NL_SKY_CLOUDS_SATURATION 0.4      // 0.0 white/grey ~ 1.0 sky coloured
-#define NL_SKY_CLOUDS_HORIZON_FADE 0.5    // clouds fade out until this height
+/* Sky clouds (Bicubic style, painted on the sky dome) -> NL_CLOUD_TYPE 4 */
+//#define NL_SKY_CLOUDS                   // set automatically when NL_CLOUD_TYPE is 4 (see end of file)
+#define NL_SKY_CLOUDS_NOISE_TEX           // [toggle] ruido desde textura (1 lectura) en vez de matemáticas
+#define NL_SKY_CLOUDS_NOISE_CELLS 16.0    // celdas voronoi de la textura (NO cambiar sin regenerarla)
+#define NL_SKY_CLOUDS_LAYERS 10           // capas = volumen y costo (4 ~ 12). Móvil: 5
+#define NL_SKY_CLOUDS_LOD_Y 0.06          // menos octavas cerca del horizonte (0.04 fiel ~ 0.08 rápido)
+#define NL_SKY_CLOUDS_SCALE 0.7           // más alto = nubes más chicas
+#define NL_SKY_CLOUDS_DENSITY 1.8         // más alto = MENOS nubes (1.2 muchas ~ 2.4 pocas)
+#define NL_SKY_CLOUDS_SPEED 1.0           // velocidad del viento
+#define NL_SKY_CLOUDS_LAYER_SQUEEZE 0.045 // separación entre capas (volumen)
+#define NL_SKY_CLOUDS_AMBIENT_MIX 0.2     // cuánto se oscurecen las capas de abajo (0.0 ~ 1.0)
+#define NL_SKY_CLOUDS_BRIGHTNESS 1.5      // brillo del lado iluminado
+#define NL_SKY_CLOUDS_HORIZON_FADE 0.5    // las nubes se desvanecen hasta esta altura
 
 //#define NL_CLOUD_AURORA_REFLECTION // [toggle] simple clouds/aurora reflection
 
@@ -246,11 +247,17 @@
   #undef NL_GROUND_RAIN_PUDDLES
   #define NL_GROUND_RAIN_PUDDLES 0.0
 
-  #undef NL_SKY_CLOUDS
+  #undef NL_CLOUD_TYPE
+  #define NL_CLOUD_TYPE 0
 
   #undef NL_LAVA_NOISE_BUMP
   #undef NL_GODRAY
   #undef NL_WATER_WAVE
+#endif
+
+/* cloud type 4: sky clouds (rendered by the Sky material, the cloud mesh is hidden) */
+#if NL_CLOUD_TYPE == 4
+  #define NL_SKY_CLOUDS
 #endif
 
 #endif

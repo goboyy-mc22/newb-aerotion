@@ -6,6 +6,7 @@
 
 #ifndef INSTANCING
   #include <newb/main.sh>
+  #include <newb/functions/skyclouds.h>
   uniform vec4 TimeOfDay;
   uniform vec4 FogColor;
   uniform vec4 FogAndDistanceControl;
@@ -30,7 +31,8 @@ void main() {
 
     #ifdef NL_SKY_CLOUDS
       if (!env.underwater && env.rainFactor < 0.99) {
-        vec3 withClouds = nlSkyClouds(skyColor, -viewDir, v_underwaterRainTimeDay.z, skycol.horizon, skycol.zenith, gl_FragCoord.xy);
+        // viewDir points away from the sky here (nlRenderSky gets -viewDir), so pass -viewDir
+        vec3 withClouds = bsbeClouds(skyColor, -viewDir, v_underwaterRainTimeDay.z, skycol.horizon, skycol.zenith, gl_FragCoord.xy);
         skyColor = mix(withClouds, skyColor, env.rainFactor);
       }
     #endif
