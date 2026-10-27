@@ -173,17 +173,15 @@
 #define NL_AURORA_COL2 vec3(0.1,0.0,1.0)
 
 /* Texture aurora (sampler2D, buffer AuroraTexture) */
-#define NL_AURORA_TEX 2.6                   // [toggle] 0.5 dim ~ 4.0 very bright
-#define NL_AURORA_TEX_COL1 vec3(0.1,1.0,0.35)  // color 1 (lower layers)
-#define NL_AURORA_TEX_COL2 vec3(0.45,0.2,1.0)  // color 2 (upper layers)
-#define NL_AURORA_TEX_LAYERS 5              // 3 fast ~ 8 thick curtains (texture reads = layers x 5 + 1)
-#define NL_AURORA_TEX_SCALE 0.35            // 0.2 large ~ 1.0 small structures
-#define NL_AURORA_TEX_STRETCH 0.45          // 0.1 long ribbons ~ 1.0 round blobs
-#define NL_AURORA_TEX_SPEED 0.01            // 0.0 static ~ 0.05 fast
-#define NL_AURORA_TEX_BLUR 0.012
-#define NL_AURORA_TEX_COVER 0.30            // 0.7 few patches ~ 0.2 covers most of the sky
-#define NL_AURORA_TEX_FADE 0.2              // fade near the horizon (0.05 ~ 0.5)
-
+#define NL_AURORA_TEX 0.55                  // [toggle] 0.2 dim ~ 1.5 very bright
+#define NL_AURORA_TEX_COL1 vec3(0.0,5.55,1.85) // color 1 (bottom edge of curtains, cyan)
+#define NL_AURORA_TEX_COL2 vec3(0.65,0.48,1.35) // color 2 (upper curtains, purple)
+#define NL_AURORA_TEX_SAMPLES 10            // 6 fast ~ 16 smooth (texture reads = samples x 3)
+#define NL_AURORA_TEX_SCALE 0.003           // 0.0015 large ~ 0.006 small structures
+#define NL_AURORA_TEX_CENTER 0.0            // texture value that glows (0.0 = voronoi lines, 1.0 = cell insides)
+#define NL_AURORA_TEX_WIDTH 1.0             // 0.7 wide ~ 2.0 thin
+#define NL_AURORA_TEX_POWER 2.0             // 1.0 soft ~ 6.0 sharp
+#define NL_AURORA_TEX_SPEED 0.2             // 0.0 static ~ 1.0 fast
 //#define NL_CLOUD_AURORA_REFLECTION // [toggle] simple clouds/aurora reflection
 
 /* Chunk loading slide in animation */

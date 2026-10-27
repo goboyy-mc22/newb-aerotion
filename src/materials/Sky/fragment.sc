@@ -41,7 +41,8 @@ void main() {
     #ifdef NL_AURORA_TEX
       // aurora made only from AuroraTexture (night only, hidden by rain and underwater)
       if (!env.underwater) {
-        skyColor = nlAuroraTex(skyColor, viewDir, v_underwaterRainTimeDay.z, env.dayFactor, env.rainFactor);
+        float auroraDither = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+        skyColor = nlAuroraTex(skyColor, viewDir, v_underwaterRainTimeDay.z, env.dayFactor, env.rainFactor, auroraDither);
       }
     #endif
 
