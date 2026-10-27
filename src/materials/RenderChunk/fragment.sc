@@ -133,7 +133,7 @@ void main() {
     foam = mix(foam, 1.0, fade * fade);
 
     // foam dims at night (same curve as nightShadowMask); full strength during the day
-    float nightFoam = mix(0.12, 1.0, smoothstep(-0.12, 0.25, env.dayFactor));
+    float nightFoam = mix(0.03, 1.0, smoothstep(-0.12, 0.25, env.dayFactor));
     diffuse.rgb = mix(diffuse.rgb, vec3(1.0, 1.0, 1.1)*3.0*nightFoam, foam);
   }
 
