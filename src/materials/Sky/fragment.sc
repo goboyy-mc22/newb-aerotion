@@ -7,6 +7,7 @@
 #ifndef INSTANCING
   #include <newb/main.sh>
   #include <newb/functions/skyclouds.h>
+  #include <newb/functions/skyaurora.h>
   uniform vec4 TimeOfDay;
   uniform vec4 FogColor;
   uniform vec4 FogAndDistanceControl;
@@ -34,6 +35,13 @@ void main() {
       if (!env.underwater && env.rainFactor < 0.99) {
         vec3 withClouds = bsbeClouds(skyColor, viewDir, v_underwaterRainTimeDay.z, skycol.horizon, skycol.zenith, gl_FragCoord.xy);
         skyColor = mix(withClouds, skyColor, env.rainFactor);
+      }
+    #endif
+
+    #ifdef NL_AURORA_TEX
+      // aurora made only from AuroraTexture (night only, hidden by rain and underwater)
+      if (!env.underwater) {
+        skyColor = nlAuroraTex(skyColor, viewDir, v_underwaterRainTimeDay.z, env.dayFactor, env.rainFactor);
       }
     #endif
 

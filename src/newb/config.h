@@ -172,6 +172,19 @@
 #define NL_AURORA_COL1 vec3(0.1,1.0,0.0)
 #define NL_AURORA_COL2 vec3(0.1,0.0,1.0)
 
+/* Texture aurora (sampler2D, buffer AuroraTexture) */
+#define NL_AURORA_TEX 2.2                   // [toggle] 0.5 dim ~ 4.0 very bright
+#define NL_AURORA_TEX_COL1 vec3(0.1,1.0,0.35)  // color 1 (lower layers)
+#define NL_AURORA_TEX_COL2 vec3(0.45,0.2,1.0)  // color 2 (upper layers)
+#define NL_AURORA_TEX_LAYERS 5              // 3 fast ~ 8 thick curtains (texture reads = layers x 2 + 1)
+#define NL_AURORA_TEX_SCALE 0.45            // 0.2 large ~ 1.0 small structures
+#define NL_AURORA_TEX_STRETCH 0.18          // 0.1 long ribbons ~ 1.0 round blobs
+#define NL_AURORA_TEX_SPEED 0.01            // 0.0 static ~ 0.05 fast
+#define NL_AURORA_TEX_WIDTH 3.2             // 1.5 wide bands ~ 8.0 thin lines
+#define NL_AURORA_TEX_RAYS 0.7              // 0.0 smooth ~ 1.0 strong vertical rays
+#define NL_AURORA_TEX_COVER 0.40            // 0.7 few patches ~ 0.2 covers most of the sky
+#define NL_AURORA_TEX_FADE 0.2              // fade near the horizon (0.05 ~ 0.5)
+
 //#define NL_CLOUD_AURORA_REFLECTION // [toggle] simple clouds/aurora reflection
 
 /* Chunk loading slide in animation */
@@ -250,6 +263,7 @@
   #define NL_GROUND_RAIN_PUDDLES 0.0
 
   #undef NL_LAVA_NOISE_BUMP
+  #undef NL_AURORA_TEX
   #undef NL_GODRAY
   #undef NL_WATER_WAVE
 #endif
