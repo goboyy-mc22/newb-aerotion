@@ -77,6 +77,22 @@
 #define NL_BH_DIST 1.9                     // blackhole size: 5.0 tiny - 0.5 massive
 #define NL_BH_SPEED 0.6                      // spiral rotation speed
 
+/* Storm around the main End island (world-space ring, lightning + swirling wind) */
+#define NL_END_STORM                            // [toggle] enable storm
+#define NL_END_STORM_CENTER vec2(0.0,0.0)       // island center (x,z)
+#define NL_END_STORM_RADIUS 95.0                // inner radius of the storm wall (blocks)
+#define NL_END_STORM_THICK 70.0                 // wall thickness
+#define NL_END_STORM_BOTTOM 5.0                 // lowest y of the storm
+#define NL_END_STORM_TOP 170.0                  // highest y of the storm
+#define NL_END_STORM_DENSITY 1.0                // 0.5 thin ~ 2.0 opaque
+#define NL_END_STORM_SPEED 0.12                 // swirl speed (radians/second)
+#define NL_END_STORM_COL1 vec3(0.10,0.05,0.20)  // dark cloud color
+#define NL_END_STORM_COL2 vec3(0.45,0.30,0.75)  // light cloud color
+#define NL_END_STORM_LIGHTNING vec3(0.70,0.65,1.0) // lightning color
+#define NL_END_STORM_FLASH 1.0                  // lightning intensity (0.0 off)
+#define NL_END_STORM_RATE 0.6                   // lightning events per second
+#define NL_END_STORM_STEPS 14                   // 8 fast ~ 20 smooth
+
 /* Rainbow */
 //#define NL_RAINBOW           // [toggle] enable rainbow in sky
 #define NL_RAINBOW_CLEAR 0.0 // 0.3 subtle ~ 1.0 bright during clear weather
@@ -251,6 +267,7 @@
 
   #undef NL_LAVA_NOISE_BUMP
   #undef NL_GODRAY
+  #undef NL_END_STORM
   #undef NL_WATER_WAVE
 #endif
 

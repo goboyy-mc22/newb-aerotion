@@ -1,5 +1,5 @@
 #ifndef INSTANCING
-$input v_texcoord0, v_posTime
+$input v_texcoord0, v_posTime, v_dir
 #endif
 
 #include <bgfx_shader.sh>
@@ -8,6 +8,7 @@ $input v_texcoord0, v_posTime
   #include <newb/main.sh>
 
   SAMPLER2D_AUTOREG(s_SkyTexture);
+  uniform vec4 CameraPosition;
 #endif
 
 void main() {
@@ -24,6 +25,13 @@ void main() {
     #endif
 
     color += 2.8*diffuse.rgb; // stars
+
+    #ifdef NL_END_STORM
+      // storm wall around the main island (world-space ring, ray goes to infinity)
+      float stormDither = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+      vec4 storm = nlEndStorm(CameraPosition.xyz, normalize(v_dir), 1500.0, v_posTime.w, stormDither);
+      color = color * storm.a + storm.rgb;
+    #endif
 
     color = colorCorrection(color);
 

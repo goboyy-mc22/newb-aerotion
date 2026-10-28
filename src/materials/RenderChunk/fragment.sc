@@ -169,6 +169,17 @@ void main() {
 
   diffuse.rgb = mix(diffuse.rgb, v_fog.rgb, v_fog.a);
 
+  #ifdef NL_END_STORM
+    if (env.end) {
+      // storm wall around the main island: ray from camera to this fragment
+      float stormDither = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+      float stormT = ViewPositionAndTime.w;
+      vec4 storm = nlEndStorm(CameraPosition.xyz, normalize(v_wpos), length(v_wpos), stormT, stormDither);
+      diffuse.rgb = diffuse.rgb * storm.a + storm.rgb;
+      diffuse.rgb *= 1.0 + 0.6 * nlEndStormFlash(stormT); // lightning lights up the island
+    }
+  #endif
+
   diffuse.rgb = colorCorrection(diffuse.rgb);
 
   gl_FragColor = diffuse;
