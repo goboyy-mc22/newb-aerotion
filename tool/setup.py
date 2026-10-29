@@ -86,6 +86,10 @@ def check_and_apply_termux_fix():
         shutil.copyfile(termux_lib_file, lib_path + "/libc++_shared.so")
 
 
+# newer source materials (Minecraft 26.60) kept in the repo, copied over tool/data/materials on setup
+OVERRIDE_MAT_DIR = os.path.join('tool', 'materials_26.60')
+
+
 def run(args):
     conf = load_conf()
 
@@ -131,6 +135,13 @@ def run(args):
             with zipfile.ZipFile(mat_filename, 'r') as zip_ref:
                 zip_ref.extractall(mat_path)
             os.remove(mat_filename)
+
+        # overlay newer source materials tracked in this repo (replaces same-named files)
+        if os.path.isdir(OVERRIDE_MAT_DIR):
+            for name in os.listdir(OVERRIDE_MAT_DIR):
+                if name.endswith('.material.json'):
+                    shutil.copyfile(os.path.join(OVERRIDE_MAT_DIR, name), os.path.join(mat_path, name))
+            progress.console.print("Applied source materials 26.60")
 
     conf["arch"] = arch
     conf["os_name"] = os_name
