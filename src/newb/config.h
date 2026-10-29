@@ -91,7 +91,7 @@
 #define NL_END_STORM_LIGHTNING vec3(0.70,0.65,1.0) // lightning color
 #define NL_END_STORM_FLASH 1.0                  // lightning intensity (0.0 off)
 #define NL_END_STORM_RATE 0.6                   // lightning events per second
-#define NL_END_STORM_STEPS 14                   // 8 fast ~ 20 smooth
+#define NL_END_STORM_STEPS 4                    // 3 fastest ~ 8 smooth (cost = steps x 1 noise)
 
 /* Rainbow */
 //#define NL_RAINBOW           // [toggle] enable rainbow in sky

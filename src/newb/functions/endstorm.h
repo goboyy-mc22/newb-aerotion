@@ -2,6 +2,7 @@
 #define ENDSTORM_H
 
 // Storm wall around the main End island, fixed in WORLD space (not on the sky).
+// Very light: few steps (NL_END_STORM_STEPS), one 2D noise per step, one analytic bolt.
 // Ray-marches a swirling cylindrical shell centered on NL_END_STORM_CENTER, using the absolute camera position.
 // Same function is used by terrain (ray ends at the fragment) and EndSky (ray goes to infinity).
 
@@ -25,7 +26,7 @@ vec3 nlEndBolt(float t, float k) {
 
 // overall flash amount (0..1) used to light up the island
 float nlEndStormFlash(float t) {
-  return max(nlEndBolt(t, 0.0).z, nlEndBolt(t, 1.0).z);
+  return nlEndBolt(t, 0.0).z;
 }
 
 // returns vec4(rgb = added light, a = transmittance)
@@ -58,7 +59,6 @@ vec4 nlEndStorm(vec3 camPos, vec3 dir, float maxDist, float t, float dither) {
   if (tB <= tA) { return vec4(0.0, 0.0, 0.0, 1.0); }
 
   vec3 bolt0 = nlEndBolt(t, 0.0);
-  vec3 bolt1 = nlEndBolt(t, 1.0);
   float rot0 = mod(t * NL_END_STORM_SPEED, 6.2831853);
 
   float dt = (tB - tA) / float(NL_END_STORM_STEPS);
@@ -80,12 +80,11 @@ vec4 nlEndStorm(vec3 camPos, vec3 dir, float maxDist, float t, float dither) {
       float cs = cos(ang);
       float sn = sin(ang);
       vec2 qr = vec2(cs * q.x - sn * q.y, sn * q.x + cs * q.y) * 0.028;
-      float n = 0.62 * noise3D(vec3(qr.x, p.y * 0.018 - t * 0.04, qr.y))
-              + 0.38 * noise3D(vec3(qr.x * 2.3 + 7.0, p.y * 0.04 - t * 0.09, qr.y * 2.3));
-      float dens = env * smoothstep(0.36, 0.78, n) * NL_END_STORM_DENSITY;
+      float n = noise2D(qr + vec2(p.y * 0.02, t * 0.04));
+      float dens = env * smoothstep(0.42, 0.72, n) * NL_END_STORM_DENSITY;
 
       if (dens > 0.0) {
-        float sigma = dens * dt * 0.05;
+        float sigma = dens * dt * 0.09;
         float absorb = 1.0 - exp(-sigma);
 
         // cloud color: darker at the bottom, lighter at the top
@@ -93,8 +92,7 @@ vec4 nlEndStorm(vec3 camPos, vec3 dir, float maxDist, float t, float dither) {
 
         // clouds near a bolt light up
         vec2 e0 = p.xz - bolt0.xy;
-        vec2 e1 = p.xz - bolt1.xy;
-        float lit = bolt0.z * exp(-dot(e0, e0) / 2500.0) + bolt1.z * exp(-dot(e1, e1) / 2500.0);
+        float lit = bolt0.z * exp(-dot(e0, e0) / 2500.0);
         c += NL_END_STORM_LIGHTNING * lit * 1.5;
 
         col += T * absorb * c;
@@ -104,8 +102,8 @@ vec4 nlEndStorm(vec3 camPos, vec3 dir, float maxDist, float t, float dither) {
   }
 
   // bolts: analytic vertical lines (stay thin and stable regardless of step count)
-  for (int k = 0; k < 2; k++) {
-    vec3 bo = k == 0 ? bolt0 : bolt1;
+  {
+    vec3 bo = bolt0;
     if (bo.z > 0.0) {
       float tc = clamp(dot(bo.xy - NL_END_STORM_CENTER - o, d) / a, 0.0, maxDist);
       float yc = camPos.y + dir.y * tc;
