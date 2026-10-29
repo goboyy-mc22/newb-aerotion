@@ -10,7 +10,7 @@ description = '''
 authors = ["Goboyy22"]
 url = "https://newb-shader.devendrn.com/"
 uuid = "95f774cf-4afa-73e7-a21a-72146307b1d2" # Use https://www.uuidgenerator.net/version4
-materials = ["Actor", "ActorGlint", "ActorMultiTexture", "Clouds", "EndSky", "ItemInHandColor", "ItemInHandColorGlint", "ItemInHandTextured", "RenderChunk","Sky", "Stars", "SunMoon", "Weather"]
+materials = ["Actor", "Clouds", "EndSky", "RenderChunk","Sky", "Stars", "SunMoon", "Weather"]
 
 [info] 
 copyright = '''
@@ -27,7 +27,7 @@ credits = '''
 
 [[subpack]]
 define = "LOW"
-materials = ["Actor", "ActorGlint", "ActorMultiTexture", "Clouds", "EndSky", "ItemInHandColor", "ItemInHandColorGlint", "ItemInHandTextured", "RenderChunk","Sky", "Stars", "SunMoon", "Weather"]
+materials = ["Actor", "Clouds", "EndSky", "RenderChunk","Sky", "Stars", "SunMoon", "Weather"]
 description = '''
 Low
 '''
