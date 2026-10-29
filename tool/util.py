@@ -34,9 +34,14 @@ def get_materials_path(mats: [str]):
     materials_path = os.path.join('src', 'materials')
     all_materials = os.listdir(materials_path)
     material_patterns = []
+    source_path = os.path.join('tool', 'data', 'materials')
     for m in mats:
         if m not in all_materials:
             raise FileNotFoundError(m)
+        # skip materials that have no source material (e.g. not present in the downloaded source materials zip)
+        if os.path.isdir(source_path) and not os.path.exists(os.path.join(source_path, m + '.material.json')):
+            print(f"Warning: '{m}' has no source material in tool/data/materials, skipping")
+            continue
         material_patterns.append(os.path.join(materials_path, m))
     return material_patterns
 

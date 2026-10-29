@@ -82,6 +82,9 @@ def _build(status: Status, profile: str, subpack: str, materials: [str], output_
         console.print(f"Error: Material '{e.args[0]}' does not exist in project.", style="bold red")
         _exit_with_error()
 
+    if not material_patterns:
+        return
+
     subpack_define = MacroDefine.from_string(subpack.upper())
 
     if not os.path.exists(output_path):
