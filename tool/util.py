@@ -5,8 +5,7 @@ import platform
 
 CONF_FILE = "tool/data/.builder.pkl"
 NS_DEV_RELEASE = "https://github.com/devendrn/newb-shader/releases/download/dev/"
-NS_MAT_RELEASE = "https://github.com/goboyy-mc22/newb-aerotion/releases/download/materials-26.60/"
-NS_DEV_MAT_SRC_URL = NS_MAT_RELEASE + "src-materials-26.60.zip"
+NS_DEV_MAT_SRC_URL = NS_DEV_RELEASE + "src-materials-1.26.51.zip"
 NS_DEV_SHADERC_URL_PREFIX = NS_DEV_RELEASE + "shaderc-"
 SHADERC_PATH = os.path.join('tool', 'data', 'shaderc')
 if os.name == 'nt':
