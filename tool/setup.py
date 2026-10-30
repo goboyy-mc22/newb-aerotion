@@ -132,15 +132,6 @@ def run(args):
                 zip_ref.extractall(mat_path)
             os.remove(mat_filename)
 
-        # materials missing from the release zip; never overwrite files that came from it
-        extra_path = os.path.join('tool', 'vanilla-extra')
-        if os.path.isdir(extra_path):
-            os.makedirs(mat_path, exist_ok=True)
-            for f in os.listdir(extra_path):
-                dest = os.path.join(mat_path, f)
-                if f.endswith('.material.json') and not os.path.exists(dest):
-                    shutil.copyfile(os.path.join(extra_path, f), dest)
-
     conf["arch"] = arch
     conf["os_name"] = os_name
     conf["mat_src_url"] = NS_DEV_MAT_SRC_URL

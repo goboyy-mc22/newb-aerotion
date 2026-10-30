@@ -1,10 +1,6 @@
 {
   "macro_overwrite": {
     "flags": {
-      "Dithering": {
-        "On": "DITHERING",
-        "Off": []
-      },
       "Instancing": {
         "On": "INSTANCING",
         "Off": []
@@ -20,7 +16,7 @@
     },
     "passes": {
       "AlphaTest": "ALPHA_TEST",
-      "DepthOnlyAlphaTest": "DEPTH_ONLY",
+      "DepthOnly": "DEPTH_ONLY",
       "DepthOnlyOpaque": "DEPTH_ONLY_OPAQUE",
       "Opaque": "OPAQUE",
       "Transparent": "TRANSPARENT"
