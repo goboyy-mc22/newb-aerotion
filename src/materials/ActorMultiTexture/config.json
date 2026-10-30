@@ -30,7 +30,7 @@
     },
     "passes": {
       "AlphaTest": "ALPHA_TEST",
-      "DepthOnlyAlphaTest": "DEPTH_ONLY",
+      "DepthOnly": "DEPTH_ONLY",
       "DepthOnlyOpaque": "DEPTH_ONLY_OPAQUE",
       "Opaque": "OPAQUE",
       "Transparent": "TRANSPARENT"
